@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=390, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>차량 상세 견적 분석</title>
+    <!-- Fonts & Icons -->
+    <link rel="stylesheet" as="style" crossorigin
+        href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="car-detail.css">
+</head>
+
+<body>
+    <!-- Sticky Header (Timer) -->
+    <header class="sticky-header">
+        <div class="header-content">
+            <div class="timer-info">
+                <span class="timer-icon">⏰</span>
+                <span class="timer-label">견적 유효시간</span>
+                <span class="timer-value" id="expiryTimer">계산 중...</span>
+            </div>
+            <div class="progress-bar-container">
+                <div class="progress-bar" id="timerProgress" style="width: 100%;"></div>
+            </div>
+        </div>
+    </header>
+
+    <div class="main-container">
+        <!-- Hero Section -->
+        <section class="hero-section">
+            <div class="hero-bg"></div>
+            <div class="hero-content">
+                <div class="vehicle-info">
+                    <span class="brand-badge" id="brandBadge">BRAND</span>
+                    <h1 class="vehicle-name" id="vehicleName">차량명 로딩중</h1>
+                    <p class="vehicle-grade" id="vehicleGrade">상세 등급 정보</p>
+                </div>
+                <div class="hero-image-wrapper" id="heroImage">
+                    <!-- Image injected by JS -->
+                </div>
+                <!-- Option List Container (Hidden by default) -->
+                <div id="optionList" class="option-list-container" style="display: none;">
+                    <div class="option-grid">
+                        <div class="option-item" onclick="toggleOption(this, 12000)">
+                            <span class="opt-name">파노라마 선루프</span>
+                            <span class="opt-price">+12,000원</span>
+                        </div>
+                        <div class="option-item" onclick="toggleOption(this, 5000)">
+                            <span class="opt-name">헤드업 디스플레이</span>
+                            <span class="opt-price">+5,000원</span>
+                        </div>
+                        <div class="option-item" onclick="toggleOption(this, 8000)">
+                            <span class="opt-name">사운드 패키지</span>
+                            <span class="opt-price">+8,000원</span>
+                        </div>
+                        <div class="option-item" onclick="toggleOption(this, 15000)">
+                            <span class="opt-name">드라이빙 어시스턴트</span>
+                            <span class="opt-price">+15,000원</span>
+                        </div>
+                        <div class="option-item" onclick="toggleOption(this, 4000)">
+                            <span class="opt-name">빌트인 캠 2</span>
+                            <span class="opt-price">+4,000원</span>
+                        </div>
+                        <div class="option-item" onclick="toggleOption(this, 7000)">
+                            <span class="opt-name">컴포트 패키지</span>
+                            <span class="opt-price">+7,000원</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 1: Price Analysis -->
+        <section class="analysis-section">
+            <div class="section-header">
+                <h2>렌탈료 분석</h2>
+                <div class="period-selector">
+                    <button class="period-btn active" data-period="5w">5주</button>
+                    <button class="period-btn" data-period="3m">3개월</button>
+                </div>
+            </div>
+
+            <div class="metric-grid">
+                <div class="metric-card current">
+                    <div class="metric-label">현재 렌탈료</div>
+                    <div class="metric-value large" id="currentPrice">-</div>
+                    <div class="metric-change" id="priceChange">
+                        <i class="fas fa-minus"></i> <span>-</span>
+                    </div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">최저 렌탈료</div>
+                    <div class="metric-value" id="minPrice">-</div>
+                    <div class="metric-sub">1주차 기준</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">평균 렌탈료</div>
+                    <div class="metric-value" id="avgPrice">-</div>
+                    <div class="metric-sub">5주 평균</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">가격 안정도</div>
+                    <div class="stability-badge" id="stabilityBadge">-</div>
+                    <div class="metric-sub">변동폭 분석</div>
+                </div>
+            </div>
+
+            <div class="chart-card">
+                <h3>주간 가격 변동 추이</h3>
+                <div class="chart-wrapper">
+                    <canvas id="priceChart"></canvas>
+                </div>
+            </div>
+
+            <div class="insight-card">
+                <div class="insight-icon">💡</div>
+                <div class="insight-text" id="insightText">
+                    데이터를 분석하고 있습니다...
+                </div>
+            </div>
+
+            <!-- Option Toggle FAB -->
+            <button id="optionFab" class="fab-btn" onclick="toggleOptionMode()">
+                <div class="fab-content">
+                    <i class="fas fa-plus fab-icon"></i>
+                    <span class="fab-text">옵션 추가</span>
+                </div>
+            </button>
+        </section>
+
+        <!-- Section 2: Capital Comparison -->
+        <section class="capital-section">
+            <div class="section-header-row">
+                <h2>캐피탈사 비교</h2>
+                <button class="btn-refresh" onclick="location.reload()">
+                    <i class="fas fa-sync-alt"></i> 가격 업데이트
+                </button>
+            </div>
+
+            <div class="best-deal-banner">
+                <div class="banner-icon">🎉</div>
+                <div class="banner-text">
+                    <h3>오늘의 최저가</h3>
+                    <p><strong id="bestCapitalName">-</strong>에서 <strong id="bestPrice">-</strong>으로 이용 가능!</p>
+                </div>
+                <div class="save-box">
+                    <span class="save-label">최대 절약</span>
+                    <span class="save-val" id="saveAmount">-</span>
+                </div>
+            </div>
+
+            <div id="capitalComparison" class="capital-grid">
+                <!-- Injected by JS -->
+            </div>
+        </section>
+
+        <!-- Section 3: Partners -->
+        <section class="partners-section">
+            <div class="partners-header">
+                <p>현재 <span class="highlight">15개 제휴사</span>의 견적을 비교 중입니다</p>
+                <div class="trust-badges">
+                    <span class="badge"><i class="fas fa-check-circle"></i> 공식제휴</span>
+                    <span class="badge"><i class="fas fa-shield-alt"></i> 안심보장</span>
+                </div>
+            </div>
+            <div class="slider-container">
+                <div class="slider-track" id="partnerSlider">
+                    <!-- Logos will be duplicated for infinite scroll -->
+                    <div class="partner-logo">A Capital</div>
+                    <div class="partner-logo">B Capital</div>
+                    <div class="partner-logo">C Capital</div>
+                    <div class="partner-logo">D Capital</div>
+                    <div class="partner-logo">E Capital</div>
+                    <div class="partner-logo">F Capital</div>
+                    <div class="partner-logo">A Capital</div>
+                    <div class="partner-logo">B Capital</div>
+                    <div class="partner-logo">C Capital</div>
+                    <div class="partner-logo">D Capital</div>
+                    <div class="partner-logo">E Capital</div>
+                    <div class="partner-logo">F Capital</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 4: QNA -->
+        <section class="qna-section">
+            <h2>자주 묻는 질문</h2>
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="궁금한 내용을 검색해보세요">
+            </div>
+            <div class="category-tabs">
+                <button class="cat-btn active">전체</button>
+                <button class="cat-btn">계약</button>
+                <button class="cat-btn">비용</button>
+                <button class="cat-btn">서류</button>
+            </div>
+            <div class="faq-list" id="faqList">
+                <!-- FAQs -->
+            </div>
+        </section>
+
+        <!-- Section 5: Documents -->
+        <section class="documents-section">
+            <h2>필요서류 안내</h2>
+            <div class="doc-tabs">
+                <button class="doc-tab active" onclick="switchDocTab('personal')">개인</button>
+                <button class="doc-tab" onclick="switchDocTab('business')">개인사업자</button>
+                <button class="doc-tab" onclick="switchDocTab('corporate')">법인사업자</button>
+            </div>
+            <div id="doc-content" class="doc-content">
+                <!-- Injected by JS -->
+            </div>
+        </section>
+
+
+    </div>
+
+    <script src="script.js"></script>
+    <script src="car-detail.js"></script>
+</body>
+
+</html>

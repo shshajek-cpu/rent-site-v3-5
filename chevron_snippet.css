@@ -1,0 +1,11 @@
+.car-chevron {
+    color: #CBD5E1;
+    font-size: 18px;
+    margin-left: auto;
+    flex-shrink: 0;
+    transition: all 0.2s ease;
+}
+
+.car-card:active .car-chevron {
+    color: #94A3B8;
+}

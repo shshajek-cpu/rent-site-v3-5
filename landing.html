@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=390, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>차량 렌탈 상담 신청</title>
+    <link rel="stylesheet" as="style" crossorigin
+        href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.8/dist/web/static/pretendard.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .landing-container {
+            background: white;
+            border-radius: 24px;
+            padding: 48px 32px;
+            max-width: 480px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.6s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header-icon {
+            font-size: 64px;
+            color: #2563eb;
+            margin-bottom: 16px;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            font-weight: 800;
+            color: #111827;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            font-size: 15px;
+            color: #6B7280;
+            font-weight: 500;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 8px;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #E5E7EB;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 500;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+        }
+
+        .form-group input::placeholder {
+            color: #9CA3AF;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 17px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(37, 99, 235, 0.4);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        .benefits {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 32px;
+            padding-top: 32px;
+            border-top: 1px solid #E5E7EB;
+        }
+
+        .benefit-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #374151;
+        }
+
+        .benefit-item i {
+            font-size: 20px;
+            color: #10B981;
+        }
+
+        .benefit-item span {
+            font-size: 15px;
+            font-weight: 500;
+        }
+
+        /* Success Modal */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.6);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            animation: fadeIn 0.3s;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 32px 24px;
+            max-width: 320px;
+            text-align: center;
+            animation: scaleUp 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes scaleUp {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .modal-icon {
+            font-size: 64px;
+            color: #10B981;
+            margin-bottom: 16px;
+        }
+
+        .modal-content h2 {
+            font-size: 22px;
+            font-weight: 800;
+            color: #111827;
+            margin-bottom: 8px;
+        }
+
+        .modal-content p {
+            font-size: 15px;
+            color: #6B7280;
+            margin-bottom: 24px;
+        }
+
+        .modal-btn {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 12px 32px;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="landing-container">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-icon">
+                <i class="fas fa-car"></i>
+            </div>
+            <h1>차량 렌탈 상담</h1>
+            <p>최저가 보장 프로그램</p>
+        </div>
+
+        <!-- Form -->
+        <form id="consultForm">
+            <div class="form-group">
+                <label for="name">이름</label>
+                <input type="text" id="name" placeholder="홍길동" required>
+            </div>
+
+            <div class="form-group">
+                <label for="phone">전화번호</label>
+                <input type="tel" id="phone" placeholder="010-0000-0000" maxlength="13" required>
+            </div>
+
+            <div class="form-group">
+                <label for="carModel">희망 차종</label>
+                <select id="carModel" required>
+                    <option value="">선택해주세요</option>
+                    <option value="그랜저">그랜저</option>
+                    <option value="싼타페">싼타페</option>
+                    <option value="아반떼">아반떼</option>
+                    <option value="쏘렌토">쏘렌토</option>
+                    <option value="스포티지">스포티지</option>
+                    <option value="G80">G80</option>
+                    <option value="GV70">GV70</option>
+                    <option value="기타">기타</option>
+                </select>
+            </div>
+
+            <button type="submit" class="submit-btn">
+                <i class="fas fa-paper-plane"></i> 상담 신청하기
+            </button>
+        </form>
+
+        <!-- Benefits -->
+        <div class="benefits">
+            <div class="benefit-item">
+                <i class="fas fa-check-circle"></i>
+                <span>3분 내 연락 드립니다</span>
+            </div>
+            <div class="benefit-item">
+                <i class="fas fa-check-circle"></i>
+                <span>최저가 보장</span>
+            </div>
+            <div class="benefit-item">
+                <i class="fas fa-check-circle"></i>
+                <span>무료 상담</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div class="modal-overlay" id="successModal">
+        <div class="modal-content">
+            <div class="modal-icon">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <h2>신청 완료!</h2>
+            <p>곧 연락 드리겠습니다.<br>감사합니다!</p>
+            <button class="modal-btn" onclick="closeModal()">확인</button>
+        </div>
+    </div>
+
+    <script src="landing.js"></script>
+</body>
+
+</html>

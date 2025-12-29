@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>카테고리 로고 설정 - Admin</title>
+    <link rel="stylesheet" as="style" crossorigin
+        href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.8/dist/web/static/pretendard.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="admin.css">
+</head>
+
+<body>
+    <button class="mobile-menu-toggle" onclick="toggleSidebar()">
+        <i class="fas fa-bars"></i>
+    </button>
+    <div class="overlay" onclick="toggleSidebar()"></div>
+
+    <div class="admin-container">
+        <aside class="sidebar">
+            <div class="logo-area">
+                <h2>Admin</h2>
+            </div>
+            <nav class="side-nav">
+                <a href="admin-list.html" class="nav-link">
+                    <i class="fas fa-list"></i>
+                    차량 목록 관리
+                </a>
+                <a href="admin-reviews.html" class="nav-link">
+                    <i class="fas fa-star"></i>
+                    출고 후기
+                </a>
+                <a href="admin-home.html" class="nav-link active">
+                    <i class="fas fa-home"></i>
+                    홈 설정
+                </a>
+                <a href="admin-inquiries.html" class="nav-link">
+                    <i class="fas fa-phone-alt"></i>
+                    신규 접수 DB
+                </a>
+            </nav>
+            <div style="margin-top: auto; padding-top: 2rem;">
+                <a href="index.html" class="nav-link">
+                    <i class="fas fa-external-link-alt"></i>
+                    메인 사이트 이동
+                </a>
+                <div style="border-top: 1px solid rgba(255,255,255,0.1); margin: 1rem 0;"></div>
+                <button onclick="logout()" class="nav-link"
+                    style="width: 100%; background: none; border: none; cursor: pointer; text-align: left;">
+                    <i class="fas fa-sign-out-alt"></i>
+                    로그아웃
+                </button>
+            </div>
+        </aside>
+
+        <main class="content-area">
+            <header class="content-header">
+                <h1>카테고리 로고 설정</h1>
+                <p>메인 페이지 상단의 브랜드 필터 로고 이미지를 관리합니다.</p>
+            </header>
+
+            <div class="card">
+                <form id="logoForm">
+                    <div class="form-group">
+                        <label for="brandSelect">브랜드 선택</label>
+                        <select id="brandSelect" required onchange="loadCurrentLogo()">
+                            <option value="">브랜드를 선택하세요</option>
+                            <option value="hyundai">현대 (Hyundai)</option>
+                            <option value="kia">기아 (Kia)</option>
+                            <option value="genesis">제네시스 (Genesis)</option>
+                            <option value="benz">벤츠 (Benz)</option>
+                            <option value="bmw">BMW</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="logoUrl">로고 이미지 URL</label>
+                        <input type="url" id="logoUrl" placeholder="https://example.com/logo.png">
+                        <small class="hint">이미지 URL을 입력하거나 아래에서 파일을 업로드하세요.</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label>이미지 파일 업로드</label>
+                        <div style="display: flex; gap: 1rem; align-items: flex-start;">
+                            <label for="logoFile" style="display: inline-block; padding: 0.8rem 1rem; background: #6B7280; color: white; border-radius: 6px; cursor: pointer;">
+                                <i class="fas fa-upload"></i> 파일 선택
+                            </label>
+                            <input type="file" id="logoFile" accept="image/*" style="display: none;" onchange="previewLogo(event)">
+                        </div>
+                    </div>
+
+                    <div id="previewContainer" style="margin-top: 1.5rem; display: none;">
+                        <label>미리보기</label>
+                        <div style="width: 100px; height: 100px; background: #f3f4f6; border-radius: 12px; display: flex; align-items: center; justify-content: center; padding: 10px; border: 1px solid #e5e7eb;">
+                            <img id="logoPreview" style="max-width: 100%; max-height: 100%; object-fit: contain;">
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn-submit">저장하기</button>
+                    </div>
+                </form>
+            </div>
+        </main>
+    </div>
+
+    <script src="auth.js"></script>
+    <script src="utils.js"></script>
+    <script src="toast.js"></script>
+    <script src="admin.js"></script>
+    <script>
+        protectAdminPage();
+
+        function toggleSidebar() {
+            document.querySelector('.sidebar').classList.toggle('active');
+            document.querySelector('.overlay').classList.toggle('active');
+        }
+
+        // 로고 데이터 로드 및 저장 로직 (LocalStorage 활용)
+        const db = JSON.parse(localStorage.getItem('carDB') || '{}');
+
+        function loadCurrentLogo() {
+            const brandId = document.getElementById('brandSelect').value;
+            const logoUrlInput = document.getElementById('logoUrl');
+            const previewContainer = document.getElementById('previewContainer');
+            const logoPreview = document.getElementById('logoPreview');
+
+            if (!brandId || !db.brands) {
+                previewContainer.style.display = 'none';
+                return;
+            }
+
+            const brand = db.brands.find(b => b.id === brandId);
+            if (brand && brand.logoUrl) {
+                logoUrlInput.value = brand.logoUrl;
+                logoPreview.src = brand.logoUrl;
+                previewContainer.style.display = 'block';
+            } else {
+                logoUrlInput.value = '';
+                previewContainer.style.display = 'none';
+            }
+        }
+
+        function previewLogo(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('logoPreview').src = e.target.result;
+                    document.getElementById('previewContainer').style.display = 'block';
+                    // 파일 업로드 시 URL 입력창은 비움 (우선순위 결정 필요)
+                    document.getElementById('logoUrl').value = '';
+                }
+                reader.readAsDataURL(file);
+            }
+        }
+
+        document.getElementById('logoForm').onsubmit = function(e) {
+            e.preventDefault();
+            const brandId = document.getElementById('brandSelect').value;
+            const logoUrl = document.getElementById('logoUrl').value;
+            const logoPreviewSrc = document.getElementById('logoPreview').src;
+
+            if (!brandId) {
+                showToast('브랜드를 선택해주세요.', 'error');
+                return;
+            }
+
+            // DB 업데이트
+            const brandIndex = db.brands.findIndex(b => b.id === brandId);
+            if (brandIndex !== -1) {
+                // 직접 입력한 URL이 있으면 그것을 사용, 아니면 미리보기(Base64) 사용
+                db.brands[brandIndex].logoUrl = logoUrl || logoPreviewSrc;
+                localStorage.setItem('carDB', JSON.stringify(db));
+                showToast('로고 설정이 저장되었습니다.', 'success');
+            }
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,95 @@
+.urgent-banner {
+    background: linear-gradient(to right, #2563eb, #5a87ed);
+    padding: 6px 12px;
+    border-radius: 12px;
+    margin: 16px 24px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    position: relative;
+    overflow: hidden;
+}
+
+.urgent-banner .banner-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+}
+
+.urgent-banner .text-content {
+    flex-grow: 1;
+}
+
+.urgent-banner .deadline-text {
+    font-size: 0.9em;
+    font-weight: bold;
+    margin-bottom: 4px;
+}
+
+.urgent-banner .deadline-text .icon {
+    margin-right: 8px;
+    animation: bounce 1.5s infinite;
+}
+
+@keyframes bounce {
+
+    0%,
+    20%,
+    50%,
+    80%,
+    100% {
+        transform: translateY(0);
+    }
+
+    40% {
+        transform: translateY(-6px);
+    }
+
+    60% {
+        transform: translateY(-3px);
+    }
+}
+
+.urgent-banner .progress-text {
+    font-size: 0.7em;
+    opacity: 0.9;
+    margin-bottom: 4px;
+}
+
+.urgent-banner .stock-countdown {
+    text-align: right;
+    font-weight: bold;
+}
+
+.urgent-banner .c-button {
+    background-color: white;
+    color: #2563eb;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 16px;
+    font-weight: bold;
+    cursor: pointer;
+    text-align: center;
+    white-space: nowrap;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s;
+}
+
+.urgent-banner .c-button:hover {
+    background-color: #f0f0f0;
+}
+
+.urgent-banner .benefit-badges {
+    display: flex;
+    gap: 6px;
+    margin-top: 6px;
+    justify-content: flex-start;
+}
+
+.urgent-banner .benefit-badge {
+    background-color: rgba(255, 255, 255, 0.2);
+    color: white;
+    padding: 2px 6px;
+    border-radius: 6px;
+    font-size: 0.75em;
+    font-weight: 500;
+}

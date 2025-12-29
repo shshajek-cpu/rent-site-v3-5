@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>출고 후기 관리 - Car Manager</title>
+    <link rel="stylesheet" as="style" crossorigin
+        href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.8/dist/web/static/pretendard.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="admin.css">
+    <style>
+        /* Statistics Cards */
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border: 1px solid var(--border-color);
+            transition: all 0.2s;
+        }
+
+        .stat-card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+        }
+
+        .stat-info {
+            flex: 1;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #111827;
+            line-height: 1;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: #6B7280;
+            margin-top: 0.25rem;
+        }
+
+        /* Table Styles */
+        .table-container {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border: 1px solid var(--border-color);
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .data-table thead {
+            background: #F9FAFB;
+            border-bottom: 2px solid #E5E7EB;
+        }
+
+        .data-table th {
+            padding: 1rem;
+            text-align: left;
+            font-weight: 700;
+            font-size: 0.875rem;
+            color: #111827;
+            white-space: nowrap;
+        }
+
+        .data-table tbody tr {
+            border-bottom: 1px solid #F3F4F6;
+            transition: background 0.15s;
+        }
+
+        .data-table tbody tr:hover {
+            background: #F9FAFB;
+        }
+
+        .data-table tbody tr.selected {
+            background: #FEF2F2;
+        }
+
+        .data-table td {
+            padding: 1rem;
+            font-size: 0.9rem;
+            vertical-align: middle;
+        }
+
+        .review-rating-display {
+            display: flex;
+            gap: 0.15rem;
+            font-size: 0.95rem;
+        }
+
+        .review-rating-display i {
+            color: #FFC107;
+        }
+
+        .review-rating-display .far {
+            color: #E5E7EB;
+        }
+
+        .review-content-cell {
+            max-width: 400px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            color: #6B7280;
+            line-height: 1.5;
+        }
+
+        .review-content-full {
+            white-space: normal;
+            max-width: 400px;
+            line-height: 1.6;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .btn-icon {
+            padding: 0.5rem 0.75rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.85rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            white-space: nowrap;
+        }
+
+        .btn-edit {
+            background: #111827;
+            color: white;
+        }
+
+        .btn-edit:hover {
+            background: #1F2937;
+        }
+
+        .btn-copy {
+            background: #10B981;
+            color: white;
+        }
+
+        .btn-copy:hover {
+            background: #059669;
+        }
+
+        .btn-delete {
+            background: #EF4444;
+            color: white;
+        }
+
+        .btn-delete:hover {
+            background: #DC2626;
+        }
+
+        /* Brand Badge Styles */
+        .brand-badge {
+            display: inline-block;
+            padding: 0.4rem 0.8rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .brand-hyundai {
+            background: #E0F2FE;
+            color: #0369A1;
+        }
+
+        .brand-kia {
+            background: #DBEAFE;
+            color: #1E40AF;
+        }
+
+        .brand-genesis {
+            background: #E0E7FF;
+            color: #4338CA;
+        }
+
+        .brand-benz {
+            background: #F3F4F6;
+            color: #1F2937;
+        }
+
+        .brand-bmw {
+            background: #F0F9FF;
+            color: #0C4A6E;
+        }
+
+        .btn-add-review {
+            background: linear-gradient(135deg, #DC2626 0%, #BE123C 100%);
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: 0 2px 8px rgba(220, 38, 38, 0.25);
+        }
+
+        .btn-add-review:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.35);
+        }
+
+        /* Modal Styles - using same as admin-list.html */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid #E5E7EB;
+            padding-bottom: 1rem;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            font-size: 1.5rem;
+            color: #111827;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #6B7280;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+        }
+
+        .modal-close:hover {
+            color: #DC2626;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #111827;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #E5E7EB;
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .rating-input {
+            display: flex;
+            gap: 0.5rem;
+            font-size: 1.5rem;
+        }
+
+        .rating-input i {
+            cursor: pointer;
+            color: #E5E7EB;
+            transition: color 0.2s;
+        }
+
+        .rating-input i.active,
+        .rating-input i:hover {
+            color: #FFC107;
+        }
+
+        .modal-footer {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: flex-end;
+            margin-top: 1.5rem;
+            padding-top: 1rem;
+            border-top: 1px solid #E5E7EB;
+        }
+
+        .btn-modal {
+            padding: 0.7rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-modal-cancel {
+            background: #F3F4F6;
+            color: #111827;
+        }
+
+        .btn-modal-cancel:hover {
+            background: #E5E7EB;
+        }
+
+        .btn-modal-submit {
+            background: linear-gradient(135deg, #DC2626 0%, #BE123C 100%);
+            color: white;
+        }
+
+        .btn-modal-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.35);
+        }
+
+        .empty-state {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--text-sub);
+            background: white;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.3;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 모바일 햄버거 메뉴 -->
+    <button class="mobile-menu-toggle" onclick="toggleSidebar()">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <!-- 오버레이 -->
+    <div class="overlay" onclick="toggleSidebar()"></div>
+
+    <div class="admin-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo-area">
+                <h2>Admin</h2>
+            </div>
+            <nav class="side-nav">
+                <a href="admin-list.html" class="nav-link">
+                    <i class="fas fa-list"></i>
+                    차량 목록 관리
+                </a>
+                <a href="admin-reviews.html" class="nav-link active">
+                    <i class="fas fa-star"></i>
+                    출고 후기
+                </a>
+                <a href="admin-home.html" class="nav-link">
+                    <i class="fas fa-home"></i>
+                    홈 설정
+                </a>
+                <a href="admin-inquiries.html" class="nav-link">
+                    <i class="fas fa-phone-alt"></i>
+                    신규 접수 DB
+                </a>
+            </nav>
+            <div style="margin-top: auto; padding-top: 2rem;">
+                <a href="landing.html" class="nav-link">
+                    <i class="fas fa-rocket"></i>
+                    랜딩페이지 이동
+                </a>
+                <a href="index.html" class="nav-link">
+                    <i class="fas fa-external-link-alt"></i>
+                    메인 사이트 이동
+                </a>
+                <div style="border-top: 1px solid rgba(255,255,255,0.1); margin: 1rem 0;"></div>
+                <button onclick="logout()" class="nav-link"
+                    style="width: 100%; background: none; border: none; cursor: pointer; text-align: left;">
+                    <i class="fas fa-sign-out-alt"></i>
+                    로그아웃
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="content-area">
+            <header class="content-header">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <h1>출고 후기 관리</h1>
+                        <p>고객의 출고 후기를 등록하고 관리할 수 있습니다.</p>
+                    </div>
+                    <button onclick="openAddReviewModal()" class="btn-add-review">
+                        <i class="fas fa-plus"></i> 후기 추가
+                    </button>
+                </div>
+            </header>
+
+            <!-- Statistics Cards -->
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin-bottom: 2rem;">
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: linear-gradient(135deg, #DC2626 0%, #BE123C 100%);">
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <div class="stat-info">
+                        <div class="stat-value" id="totalReviews">0</div>
+                        <div class="stat-label">전체 후기</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: linear-gradient(135deg, #FFC107 0%, #FF9800 100%);">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <div class="stat-info">
+                        <div class="stat-value" id="avgRating">0.0</div>
+                        <div class="stat-label">평균 평점</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: linear-gradient(135deg, #10B981 0%, #059669 100%);">
+                        <i class="fas fa-thumbs-up"></i>
+                    </div>
+                    <div class="stat-info">
+                        <div class="stat-value" id="highRatedReviews">0</div>
+                        <div class="stat-label">5점 후기</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Toolbar -->
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; gap: 1rem; flex-wrap: wrap;">
+                <div style="display: flex; gap: 1rem; align-items: center; flex: 1;">
+                    <input type="text" id="searchInput" placeholder="고객명, 차량명으로 검색..."
+                           style="padding: 0.8rem 1rem; border: 1px solid #E5E7EB; border-radius: 8px; flex: 1; max-width: 400px;">
+
+                    <select id="brandFilter" style="padding: 0.8rem 1rem; border: 1px solid #E5E7EB; border-radius: 8px;">
+                        <option value="">전체 브랜드</option>
+                        <option value="hyundai">현대</option>
+                        <option value="kia">기아</option>
+                        <option value="genesis">제네시스</option>
+                        <option value="benz">벤츠</option>
+                        <option value="bmw">BMW</option>
+                    </select>
+
+                    <select id="ratingFilter" style="padding: 0.8rem 1rem; border: 1px solid #E5E7EB; border-radius: 8px;">
+                        <option value="">전체 평점</option>
+                        <option value="5">⭐⭐⭐⭐⭐ (5점)</option>
+                        <option value="4">⭐⭐⭐⭐ (4점 이상)</option>
+                        <option value="3">⭐⭐⭐ (3점 이상)</option>
+                    </select>
+                </div>
+
+                <div style="display: flex; gap: 0.5rem; align-items: center;">
+                    <span id="selectedCount" style="display: none; color: #6B7280; font-size: 0.95rem;"></span>
+                    <button id="deleteSelectedBtn" onclick="deleteSelectedReviews()"
+                            style="display: none; padding: 0.7rem 1.2rem; background: #EF4444; color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; transition: all 0.2s;">
+                        <i class="fas fa-trash"></i> 선택 삭제
+                    </button>
+                </div>
+            </div>
+
+            <!-- Reviews Table -->
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 50px;">
+                                <input type="checkbox" id="selectAllCheckbox" onchange="toggleSelectAll(this)"
+                                       style="width: 18px; height: 18px; cursor: pointer;">
+                            </th>
+                            <th style="width: 100px;">평점</th>
+                            <th style="width: 120px;">브랜드</th>
+                            <th style="width: 150px;">차량명</th>
+                            <th style="width: 100px;">고객명</th>
+                            <th>후기 내용</th>
+                            <th style="width: 120px;">등록일</th>
+                            <th style="width: 200px;">액션</th>
+                        </tr>
+                    </thead>
+                    <tbody id="reviewTableBody">
+                        <!-- JavaScript로 동적 생성 -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Empty State -->
+            <div class="empty-state" id="emptyState" style="display: none;">
+                <i class="fas fa-star" style="font-size: 64px; color: #E5E7EB; margin-bottom: 16px;"></i>
+                <p style="color: #6B7280; font-size: 16px;">등록된 출고 후기가 없습니다.</p>
+            </div>
+        </main>
+    </div>
+
+    <!-- Edit Review Modal -->
+    <div class="modal-overlay" id="editReviewModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>출고 후기 수정</h2>
+                <button class="modal-close" onclick="closeEditReviewModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <form id="editReviewForm">
+                <input type="hidden" id="editReviewId">
+
+                <div class="form-group">
+                    <label for="editCarBrand">브랜드</label>
+                    <select id="editCarBrand" required>
+                        <option value="">브랜드를 선택하세요</option>
+                        <option value="hyundai">현대</option>
+                        <option value="kia">기아</option>
+                        <option value="genesis">제네시스</option>
+                        <option value="benz">벤츠</option>
+                        <option value="bmw">BMW</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="editCarName">차량명</label>
+                    <input type="text" id="editCarName" placeholder="예: 그랜저, K5" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="editCustomerName">고객명 (익명 처리)</label>
+                    <input type="text" id="editCustomerName" placeholder="예: 김**" required>
+                </div>
+
+                <div class="form-group">
+                    <label>평점</label>
+                    <div class="rating-input" id="editRatingInput">
+                        <i class="far fa-star" data-rating="1"></i>
+                        <i class="far fa-star" data-rating="2"></i>
+                        <i class="far fa-star" data-rating="3"></i>
+                        <i class="far fa-star" data-rating="4"></i>
+                        <i class="far fa-star" data-rating="5"></i>
+                    </div>
+                    <input type="hidden" id="editRating" value="5">
+                </div>
+
+                <div class="form-group">
+                    <label for="editContent">후기 내용</label>
+                    <textarea id="editContent" placeholder="출고 후기를 작성해주세요..." required></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="editReviewImage">이미지 (선택)</label>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <input type="url" id="editReviewImage" placeholder="이미지 URL 또는 파일 업로드" style="flex: 1;">
+                        <label for="editImageFile"
+                            style="display: inline-block; padding: 0.8rem 1rem; background: #6B7280; color: white; border-radius: 6px; cursor: pointer; white-space: nowrap;">
+                            <i class="fas fa-upload"></i> 파일 선택
+                        </label>
+                        <input type="file" id="editImageFile" accept="image/*" style="display: none;">
+                    </div>
+                    <div id="editImagePreview" style="margin-top: 1rem; display: none;">
+                        <img id="editPreviewImg" style="max-width: 100%; max-height: 200px; border-radius: 6px;">
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn-modal btn-modal-cancel"
+                        onclick="closeEditReviewModal()">취소</button>
+                    <button type="submit" class="btn-modal btn-modal-submit">수정 완료</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Review Modal -->
+    <div class="modal-overlay" id="addReviewModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>출고 후기 추가</h2>
+                <button class="modal-close" onclick="closeAddReviewModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <form id="reviewForm">
+                <div class="form-group">
+                    <label for="carBrand">브랜드</label>
+                    <select id="carBrand" required>
+                        <option value="">브랜드를 선택하세요</option>
+                        <option value="hyundai">현대</option>
+                        <option value="kia">기아</option>
+                        <option value="genesis">제네시스</option>
+                        <option value="benz">벤츠</option>
+                        <option value="bmw">BMW</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="carName">차량명</label>
+                    <input type="text" id="carName" placeholder="예: 그랜저, K5" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="customerName">고객명 (익명 처리)</label>
+                    <input type="text" id="customerName" placeholder="예: 김**" required>
+                </div>
+
+                <div class="form-group">
+                    <label>평점</label>
+                    <div class="rating-input" id="ratingInput">
+                        <i class="far fa-star" data-rating="1"></i>
+                        <i class="far fa-star" data-rating="2"></i>
+                        <i class="far fa-star" data-rating="3"></i>
+                        <i class="far fa-star" data-rating="4"></i>
+                        <i class="far fa-star" data-rating="5"></i>
+                    </div>
+                    <input type="hidden" id="rating" value="5">
+                </div>
+
+                <div class="form-group">
+                    <label for="content">후기 내용</label>
+                    <textarea id="content" placeholder="출고 후기를 작성해주세요..." required></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="reviewImage">이미지 (선택)</label>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <input type="url" id="reviewImage" placeholder="이미지 URL 또는 파일 업로드" style="flex: 1;">
+                        <label for="imageFile"
+                            style="display: inline-block; padding: 0.8rem 1rem; background: #6B7280; color: white; border-radius: 6px; cursor: pointer; white-space: nowrap;">
+                            <i class="fas fa-upload"></i> 파일 선택
+                        </label>
+                        <input type="file" id="imageFile" accept="image/*" style="display: none;">
+                    </div>
+                    <div id="imagePreview" style="margin-top: 1rem; display: none;">
+                        <img id="previewImg" style="max-width: 100%; max-height: 200px; border-radius: 6px;">
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn-modal btn-modal-cancel" onclick="closeAddReviewModal()">취소</button>
+                    <button type="submit" class="btn-modal btn-modal-submit">등록</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="auth.js"></script>
+    <script>
+        protectAdminPage();
+    </script>
+    <script src="utils.js"></script>
+    <script src="toast.js"></script>
+    <script src="admin.js"></script>
+    <script>
+        // 사이드바 토글 함수
+        function toggleSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+            const overlay = document.querySelector('.overlay');
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
+        }
+    </script>
+    <script src="admin-reviews.js"></script>
+</body>
+
+</html>
