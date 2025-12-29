@@ -21,18 +21,39 @@ const SEED_DATA = {
 };
 
 // --- LocalStorage Logic ---
+// --- Image Assets (External Reliable URLs) ---
+const CAR_IMAGES = {
+    1: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/Hyundai_Grandeur_Calligraphy_GN7_Abyss_Black_Pearl_%282%29.jpg/640px-Hyundai_Grandeur_Calligraphy_GN7_Abyss_Black_Pearl_%282%29.jpg', // Grandeur
+    2: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/22/2023_Hyundai_Santa_Fe_PHEV_%28US%29_front_view.jpg/640px-2023_Hyundai_Santa_Fe_PHEV_%28US%29_front_view.jpg', // Santa Fe
+    3: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/62/Hyundai_Avante_CN7_FL_Meta_Blue_Pearl_%283%29.jpg/640px-Hyundai_Avante_CN7_FL_Meta_Blue_Pearl_%283%29.jpg', // Avante
+    4: 'https://upload.wikimedia.org/wikipedia/commons/a/aa/Kia_Sorento_MQ4_front_view_%28South_Korea%29_01.png', // Sorento (Transparent)
+    5: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/23/Kia_Sportage_NQ5_Gravity_Snow_White_Pearl_%281%29.jpg/640px-Kia_Sportage_NQ5_Gravity_Snow_White_Pearl_%281%29.jpg', // Sportage
+    6: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/2017_Genesis_G80_3.8_HTRAC%2C_front_3.18.19.jpg/640px-2017_Genesis_G80_3.8_HTRAC%2C_front_3.18.19.jpg', // G80
+    7: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/90/Genesis_GV70_JK1_Mauna_Red_%281%29.jpg/640px-Genesis_GV70_JK1_Mauna_Red_%281%29.jpg', // GV70
+    8: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/27/Mercedes-Benz_W213_E_220_d_Exclusive_front_20190722.jpg/640px-Mercedes-Benz_W213_E_220_d_Exclusive_front_20190722.jpg', // E-Class
+    9: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/43/BMW_G30_IMG_0058.jpg/640px-BMW_G30_IMG_0058.jpg' // 5 Series
+};
+
+// --- LocalStorage Logic ---
 function initDB() {
-    const local = localStorage.getItem('carDB');
-    if (!local) {
-        localStorage.setItem('carDB', JSON.stringify(SEED_DATA));
-        return SEED_DATA;
+    let data = JSON.parse(localStorage.getItem('carDB') || 'null');
+
+    // Always merge fresh SEED_DATA for critical updates (like missing images)
+    if (!data || !data.cars) {
+        data = JSON.parse(JSON.stringify(SEED_DATA));
     }
-    const parsed = JSON.parse(local);
-    if (!parsed.cars) {
-        localStorage.setItem('carDB', JSON.stringify(SEED_DATA));
-        return SEED_DATA;
+
+    // Auto-Repair: Inject Images if missing
+    if (data.cars) {
+        data.cars.forEach(car => {
+            if (!car.image || car.image === 'undefined') {
+                car.image = CAR_IMAGES[car.id] || 'https://placehold.co/600x400/111827/ffffff.png?text=No+Image';
+            }
+        });
+        localStorage.setItem('carDB', JSON.stringify(data));
     }
-    return parsed;
+
+    return data;
 }
 
 const db = initDB();
