@@ -1981,7 +1981,16 @@ function handleLogin() {
 
     // Check if phone matches any inquiry
     const inquiries = JSON.parse(localStorage.getItem('inquiries') || '[]');
-    const matchedInquiry = inquiries.find(i => i.phone === fullPhone);
+    let matchedInquiry = inquiries.find(i => i.phone === fullPhone);
+
+    // [데모 계정] 모바일 테스트 편의를 위해 010-1234-5678은 항상 허용
+    if (fullPhone === '010-1234-5678' && !matchedInquiry) {
+        matchedInquiry = { 
+            phone: fullPhone, 
+            verified: true, 
+            name: '데모계정' 
+        };
+    }
 
     // 신규 DB에 없는 번호는 로그인 불가
     if (!matchedInquiry) {
