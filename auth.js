@@ -67,7 +67,7 @@ function logout() {
 if (document.getElementById('loginForm')) {
     // 이미 로그인되어 있으면 대시보드로 리다이렉트
     if (checkAuth()) {
-        window.location.href = 'admin.html';
+        window.location.href = 'admin-list.html';
     }
 
     // 비밀번호 표시/숨김 토글
@@ -91,7 +91,7 @@ if (document.getElementById('loginForm')) {
 
         if (login(username, password)) {
             // 로그인 성공
-            window.location.href = 'admin.html';
+            window.location.href = 'admin-list.html';
         } else {
             // 로그인 실패
             errorMessage.classList.add('show');

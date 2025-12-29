@@ -174,6 +174,5 @@ function deleteQuote(quoteId) {
 function logout() {
     if (confirm('로그아웃 하시겠습니까?')) {
         localStorage.removeItem('adminToken');
-        window.location.href = 'admin.html';
-    }
+                    window.location.href = 'admin-list.html';    }
 }
