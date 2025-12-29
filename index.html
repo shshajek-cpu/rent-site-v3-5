@@ -119,7 +119,8 @@
                 <!-- Timer Progress -->
                 <div class="timer-info-bar">
                     <div class="timer-text-row">
-                        <span class="timer-icon">⏰</span>
+                        <img src="images/icons/3d-timer.png" alt="timer" class="icon-3d-inline"
+                            style="width: 24px; height: 24px; vertical-align: middle;">
                         <span class="timer-label">견적 유효시간</span>
                         <span class="timer-value" id="expiryTimer">계산 중...</span>
                     </div>
@@ -194,7 +195,8 @@
                     <div class="chart-card">
                         <div class="chart-header">
                             <h3>
-                                <i class="fas fa-chart-line" style="color: #DC2626; margin-right: 6px;"></i>
+                                <img src="images/icons/3d-chart.png" alt="chart" class="icon-3d-inline"
+                                    style="width: 24px; height: 24px; vertical-align: middle; margin-right: 6px;">
                                 최근 5달간 렌탈료 변동 추이
                             </h3>
                             <span class="change-badge negative">
@@ -224,12 +226,12 @@
                         <div class="terms-info-bar">
                             <div class="term-item">
                                 <span class="term-label">계약기간</span>
-                                <span class="term-value">48개월</span>
+                                <span class="term-value">60개월</span>
                             </div>
                             <div class="divider"></div>
                             <div class="term-item">
                                 <span class="term-label">약정거리</span>
-                                <span class="term-value">20,000km</span>
+                                <span class="term-value">10,000km</span>
                             </div>
                             <div class="divider"></div>
                             <div class="term-item">
@@ -249,7 +251,9 @@
                         <!-- Comparison Content -->
                         <div class="comparison-content">
                             <div class="sub-header-row">
-                                <i class="fas fa-clock"></i> 실시간 캐피탈 비교 리포트
+                                <img src="images/icons/3d-timer.png" alt="clock" class="icon-3d-inline"
+                                    style="width: 20px; height: 20px; vertical-align: middle; margin-right: 6px;"> 실시간
+                                캐피탈 비교 리포트
                             </div>
                             <div id="capitalList" class="capital-list">
                                 <!-- Dynamic Content Injection -->
@@ -262,7 +266,8 @@
                 <section class="partners-section">
                     <div class="partners-header">
                         <div class="header-icon">
-                            <i class="fas fa-handshake"></i>
+                            <img src="images/icons/3d-handshake.png" alt="handshake" class="icon-3d"
+                                style="width: 48px; height: 48px;">
                         </div>
                         <h3 class="partners-title">신뢰할 수 있는 제휴 캐피탈</h3>
                         <p class="partners-subtitle">전국 주요 캐피탈사와 실시간 연동</p>
@@ -270,36 +275,44 @@
                     <div class="slider-container">
                         <div class="slider-track">
                             <div class="partner-card">
-                                <div class="partner-icon">🏦</div>
+                                <div class="partner-icon"><img src="images/icons/3d-bank.png" alt="bank"
+                                        style="width: 40px; height: 40px;"></div>
                                 <div class="partner-name">A Capital</div>
                             </div>
                             <div class="partner-card">
-                                <div class="partner-icon">🏦</div>
+                                <div class="partner-icon"><img src="images/icons/3d-bank.png" alt="bank"
+                                        style="width: 40px; height: 40px;"></div>
                                 <div class="partner-name">B Capital</div>
                             </div>
                             <div class="partner-card">
-                                <div class="partner-icon">🏦</div>
+                                <div class="partner-icon"><img src="images/icons/3d-bank.png" alt="bank"
+                                        style="width: 40px; height: 40px;"></div>
                                 <div class="partner-name">C Capital</div>
                             </div>
                             <div class="partner-card">
-                                <div class="partner-icon">🏦</div>
+                                <div class="partner-icon"><img src="images/icons/3d-bank.png" alt="bank"
+                                        style="width: 40px; height: 40px;"></div>
                                 <div class="partner-name">D Capital</div>
                             </div>
                             <div class="partner-card">
-                                <div class="partner-icon">🏦</div>
+                                <div class="partner-icon"><img src="images/icons/3d-bank.png" alt="bank"
+                                        style="width: 40px; height: 40px;"></div>
                                 <div class="partner-name">E Capital</div>
                             </div>
                             <div class="partner-card">
-                                <div class="partner-icon">🏦</div>
+                                <div class="partner-icon"><img src="images/icons/3d-bank.png" alt="bank"
+                                        style="width: 40px; height: 40px;"></div>
                                 <div class="partner-name">F Capital</div>
                             </div>
                             <!-- 반복 (무한 슬라이드) -->
                             <div class="partner-card">
-                                <div class="partner-icon">🏦</div>
+                                <div class="partner-icon"><img src="images/icons/3d-bank.png" alt="bank"
+                                        style="width: 40px; height: 40px;"></div>
                                 <div class="partner-name">A Capital</div>
                             </div>
                             <div class="partner-card">
-                                <div class="partner-icon">🏦</div>
+                                <div class="partner-icon"><img src="images/icons/3d-bank.png" alt="bank"
+                                        style="width: 40px; height: 40px;"></div>
                                 <div class="partner-name">B Capital</div>
                             </div>
                         </div>
@@ -316,9 +329,9 @@
                 <section class="documents-section">
                     <h2>필요서류</h2>
                     <div class="doc-tabs">
-                        <button class="doc-tab active" onclick="switchDocTab('personal')">개인</button>
-                        <button class="doc-tab" onclick="switchDocTab('business')">사업자</button>
-                        <button class="doc-tab" onclick="switchDocTab('corporate')">법인</button>
+                        <button class="doc-tab active" onclick="switchDocTab('personal', event)">개인</button>
+                        <button class="doc-tab" onclick="switchDocTab('business', event)">사업자</button>
+                        <button class="doc-tab" onclick="switchDocTab('corporate', event)">법인</button>
                     </div>
                     <div id="doc-content" class="doc-content"></div>
                 </section>
@@ -381,19 +394,37 @@
                             <h2 class="detail-car-name" id="detailCarName">차량명</h2>
                         </div>
 
-                        <!-- Accordion Selectors Container -->
-                        <div id="detailAccordionContainer" class="detail-accordion-container">
-                            <!-- Accordions Injected by JS -->
-                        </div>
-
+                        <!-- Final Rental Fee (Moved Above Accordion) -->
                         <div class="detail-price-box">
                             <span class="label">최종 월 렌탈료</span>
                             <h1 class="price" id="detailTotalPrice">0원</h1>
                         </div>
 
+                        <!-- Accordion Selectors Container -->
+                        <div id="detailAccordionContainer" class="detail-accordion-container">
+                            <!-- Accordions Injected by JS -->
+                        </div>
+
+                        <!-- Section 4: QNA -->
+                        <section class="qna-section">
+                            <h2>자주 묻는 질문</h2>
+                            <div class="faq-list" id="faqListDetail"></div>
+                        </section>
+
+                        <!-- Section 5: Documents -->
+                        <section class="documents-section">
+                            <h2>필요서류</h2>
+                            <div class="doc-tabs" id="detailDocTabs">
+                                <button class="doc-tab active" onclick="switchDocTab('personal', event)">개인</button>
+                                <button class="doc-tab" onclick="switchDocTab('business', event)">사업자</button>
+                                <button class="doc-tab" onclick="switchDocTab('corporate', event)">법인</button>
+                            </div>
+                            <div id="doc-content-detail" class="doc-content"></div>
+                        </section>
+
                         <div class="detail-actions">
-                            <button class="btn-consult-request" onclick="alert('상담 신청이 완료되었습니다! (데모)')">
-                                <i class="fas fa-headset"></i> 전문 상담원 연결
+                            <button class="btn-consult-request" onclick="submitQuoteToAdmin()">
+                                <i class="fas fa-paper-plane"></i> 상담 신청하기
                             </button>
                         </div>
                     </div>
@@ -521,6 +552,23 @@
                 <div class="modal-actions">
                     <button id="btnConfirmQuote" class="btn-confirm-yes">네 이 차량으로 할게요</button>
                     <button id="btnCancelQuote" class="btn-confirm-no">아니요 다른차량으로 알아볼래요</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Requote Confirmation Modal -->
+    <div id="requoteConfirmModal" class="modal-overlay hidden">
+        <div class="confirm-modal glass-panel">
+            <div class="modal-content">
+                <div class="modal-icon-area">
+                    <i class="fas fa-sync-alt"></i>
+                </div>
+                <h3>추가하신 내용을<br>재견적 해드릴까요?</h3>
+                <p class="modal-description">선택하신 옵션으로 최적의 견적을 산출해드립니다.</p>
+                <div class="modal-actions">
+                    <button id="btnConfirmRequote" class="btn-confirm-yes">네, 재견적 요청할게요</button>
+                    <button id="btnCancelRequote" class="btn-confirm-no">취소</button>
                 </div>
             </div>
         </div>

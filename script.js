@@ -63,6 +63,7 @@ let currentBrand = 'all';
 let currentSearchKeyword = '';
 let selectedCar = null;
 let timerInterval = null; // To clear interval on transitions
+let currentViewingQuoteId = null; // Track currently viewing quote for admin submission
 
 // DOM Elements
 const brandFilterEl = document.getElementById('brandFilter');
@@ -897,7 +898,7 @@ function closeQuoteConfirmModal() {
 document.addEventListener('DOMContentLoaded', () => {
     // Other init logic...
 
-    // Modal Buttons
+    // Quote Confirmation Modal Buttons
     const btnYes = document.getElementById('btnConfirmQuote');
     const btnNo = document.getElementById('btnCancelQuote');
 
@@ -906,6 +907,17 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     if (btnNo) {
         btnNo.addEventListener('click', closeQuoteConfirmModal);
+    }
+
+    // Requote Confirmation Modal Buttons
+    const btnConfirmRequote = document.getElementById('btnConfirmRequote');
+    const btnCancelRequote = document.getElementById('btnCancelRequote');
+
+    if (btnConfirmRequote) {
+        btnConfirmRequote.addEventListener('click', confirmRequote);
+    }
+    if (btnCancelRequote) {
+        btnCancelRequote.addEventListener('click', closeRequoteConfirmModal);
     }
 });
 
@@ -923,6 +935,29 @@ function handleQuoteConfirmation() {
     // Since we are in "Analysis" view, we can try to grab the best price displayed?
     // Let's stick to base logic for safety + minimal data as requested (User said "Just image" but we need object)
 
+    // Collect selected options from the page
+    const selectedOptions = [];
+    const selectedOptionElements = document.querySelectorAll('.option-item.selected');
+    selectedOptionElements.forEach(opt => {
+        const optionName = opt.querySelector('.opt-name')?.textContent || '';
+        const optionPrice = parseInt(opt.dataset.price || 0);
+        const optionIcon = opt.dataset.icon || 'fa-check';
+
+        if (optionName) {
+            selectedOptions.push({
+                name: optionName,
+                price: optionPrice,
+                icon: optionIcon
+            });
+        }
+    });
+
+    console.log('[handleQuoteConfirmation] Selected options:', selectedOptions);
+
+    // Calculate total price (base + options)
+    const optionsTotal = selectedOptions.reduce((sum, opt) => sum + opt.price, 0);
+    const totalPrice = window.selectedCar.price + optionsTotal;
+
     // Attempt to match requestQuote structure so it renders correctly
     const quoteData = {
         id: 'quote_' + Date.now(),
@@ -933,12 +968,18 @@ function handleQuoteConfirmation() {
             name: window.selectedCar.name,
             grade: window.selectedCar.grade,
             mileage: window.selectedCar.mileage,
-            image: window.selectedCar.image, // User specifically wanted this
+            image: window.selectedCar.image,
             basePrice: window.selectedCar.price
         },
-        options: [], // Empty options for "Final Quote" from analysis (or could grab if we tracked them)
-        totalPrice: window.selectedCar.price, // Simplify for now
-        customerPhone: "010-0000-0000" // Default or grab if logged in? Let's leave undefined or grab from localStorage
+        options: selectedOptions,
+        totalPrice: totalPrice,
+        customerPhone: "010-0000-0000",
+        selectedOptions: {
+            term: '60개월',
+            mileage: '10,000km',
+            deposit: '30%',
+            region: '서울/경기'
+        }
     };
 
     // Grab Login Info if exists
@@ -953,6 +994,13 @@ function handleQuoteConfirmation() {
     quotes.push(quoteData);
     localStorage.setItem('savedQuotes', JSON.stringify(quotes));
 
+    // 2-1. Save to adminQuotes (어드민 페이지에서 보기 위함)
+    const adminQuotes = JSON.parse(localStorage.getItem('adminQuotes') || '[]');
+    adminQuotes.push(quoteData);
+    localStorage.setItem('adminQuotes', JSON.stringify(adminQuotes));
+
+    console.log('[handleQuoteConfirmation] Quote saved:', quoteData);
+
     // 3. UX Feedback & Redirect
     closeQuoteConfirmModal();
 
@@ -966,8 +1014,70 @@ function handleQuoteConfirmation() {
     }, 300);
 }
 
+// --- Toggle Price Display (for testing AI loading / Final price) ---
+function togglePriceDisplay(showAILoading) {
+    console.log('[togglePriceDisplay] showAILoading:', showAILoading);
+
+    const quotes = JSON.parse(localStorage.getItem('savedQuotes') || '[]');
+    const quote = quotes.find(q => q.id === currentViewingQuoteId);
+
+    if (!quote) {
+        console.error('[togglePriceDisplay] Quote not found:', currentViewingQuoteId);
+        return;
+    }
+
+    const priceContainer = document.getElementById('detailTotalPrice')?.parentElement;
+    if (!priceContainer) {
+        console.error('[togglePriceDisplay] priceContainer not found');
+        return;
+    }
+
+    if (showAILoading) {
+        // Show AI Loading State
+        const estimatedPrice = quote.totalPrice || quote.car.basePrice || 0;
+        priceContainer.innerHTML = `
+            <div class="ai-loading-overlay">
+                <div class="ai-bg-text">${estimatedPrice.toLocaleString()}원</div>
+                <div class="ai-3d-icon">
+                    <div class="ai-cube">
+                        <div class="cube-face front"><i class="fas fa-brain"></i></div>
+                        <div class="cube-face back"></div>
+                        <div class="cube-face right"></div>
+                        <div class="cube-face left"></div>
+                        <div class="cube-face top"></div>
+                        <div class="cube-face bottom"></div>
+                    </div>
+                </div>
+                <p class="ai-compact-message">
+                    <strong>AI 견적 분석 중...</strong><br>
+                    <span class="ai-sub-text">최적의 견적을 산출하고 있어요</span>
+                </p>
+                <div class="ai-mini-progress">
+                    <div class="ai-mini-fill"></div>
+                </div>
+            </div>
+        `;
+        priceContainer.classList.add('ai-loading-state');
+    } else {
+        // Show Final Price
+        const displayPrice = quote.adminFinalPrice || (quote.totalPrice || quote.car.basePrice);
+        const isTestPrice = !quote.adminFinalPrice;
+
+        priceContainer.innerHTML = `
+            <span class="label">최종 월 렌탈료</span>
+            <h1 class="price" id="detailTotalPrice">${displayPrice.toLocaleString()}원</h1>
+            ${isTestPrice ? '<p style="font-size: 0.85rem; color: #EF4444; margin-top: 0.5rem;">⚠️ 테스트 가격 (어드민 미입력)</p>' : ''}
+        `;
+        priceContainer.classList.remove('ai-loading-state');
+    }
+
+    console.log('[togglePriceDisplay] Update complete');
+}
+
 // --- Quote Detail View Logic ---
 function openQuoteDetail(quoteId) {
+    console.log('[openQuoteDetail] START - quoteId:', quoteId, 'testAILoadingMode:', window.testAILoadingMode);
+
     const quotes = JSON.parse(localStorage.getItem('savedQuotes') || '[]');
     const quote = quotes.find(q => q.id === quoteId);
 
@@ -975,6 +1085,24 @@ function openQuoteDetail(quoteId) {
         console.error('Quote not found:', quoteId);
         return;
     }
+
+    // 현재 로그인한 사용자 확인
+    const loginData = localStorage.getItem('customerLogin');
+    let currentUserPhone = null;
+
+    if (loginData) {
+        const parsed = JSON.parse(loginData);
+        currentUserPhone = parsed.phone;
+    }
+
+    // 본인의 견적인지 확인
+    if (quote.customerPhone !== currentUserPhone) {
+        alert('본인의 견적만 조회할 수 있습니다.');
+        return;
+    }
+
+    // Store current viewing quote ID
+    currentViewingQuoteId = quoteId;
 
     // 1. Hide List
     const listContainer = document.getElementById('savedQuotesList');
@@ -1001,59 +1129,86 @@ function openQuoteDetail(quoteId) {
         // --- Render Accordions ---
         const accordionContainer = document.getElementById('detailAccordionContainer');
         if (accordionContainer) {
-            // Mock Data for Selectors
+            // Get saved values from quote
+            const savedTerm = quote.selectedOptions?.term || '60개월';
+            const savedMileage = quote.selectedOptions?.mileage || '10,000km';
+            const savedDeposit = quote.selectedOptions?.deposit || '30%';
+            const savedRegion = quote.selectedOptions?.region || '서울/경기';
+
+            // Get car options
+            const carOptions = getOrGenerateOptions(quote.car.id);
+            const savedOptionNames = (quote.options || []).map(o => o.name);
+            const selectedCount = savedOptionNames.length;
+
+            // Accordion data including options
             const selectorData = [
                 {
                     id: 'term',
                     title: '이용 기간',
-                    currentValue: '48개월', // Default or from quote
+                    currentValue: savedTerm,
                     options: ['36개월', '48개월', '60개월']
                 },
                 {
                     id: 'mileage',
                     title: '연간 주행거리',
-                    currentValue: '2만km', // Default or from quote
-                    options: ['1만km', '2만km', '3만km', '4만km', '5만km', '무제한']
+                    currentValue: savedMileage,
+                    options: ['10,000km', '20,000km', '30,000km', '40,000km', '50,000km', '무제한']
                 },
                 {
-                    id: 'grade',
-                    title: '차량 등급',
-                    currentValue: quote.car.grade,
-                    options: ['프리미엄', '익스클루시브', '인스퍼레이션'] // Mock options
-                },
-                {
-                    id: 'options',
-                    title: '옵션 선택',
-                    currentValue: `${(quote.options || []).length}개 선택됨`,
-                    options: ['선루프', '헤드업 디스플레이', '사운드 패키지', '드라이빙 어시스턴트'], // Mock options
-                    isMulti: true,
-                    selected: (quote.options || []).map(o => o.name)
+                    id: 'deposit',
+                    title: '보증금',
+                    currentValue: savedDeposit,
+                    options: ['0%', '10%', '20%', '30%', '40%', '50%']
                 },
                 {
                     id: 'region',
                     title: '인도 지역',
-                    currentValue: '서울/경기',
+                    currentValue: savedRegion,
                     options: ['서울/경기', '충청/강원', '전라/경상', '제주/도서산간']
+                },
+                {
+                    id: 'options',
+                    title: '추가 옵션 선택',
+                    currentValue: `${selectedCount}개 선택됨`,
+                    isOptionGrid: true
                 }
             ];
 
             accordionContainer.innerHTML = selectorData.map((item, index) => {
-                const isOpen = index === 0 ? 'active' : ''; // Open first item by default
+                const isOpen = index === 0 ? 'active' : '';
 
-                // Generate Options HTML
-                let optionsHtml = '';
-                if (item.id === 'options') {
-                    // Multi-select for Options
-                    optionsHtml = item.options.map(opt => {
-                        const isSelected = item.selected && item.selected.includes(opt) ? 'selected' : '';
-                        return `<button class="accordion-option-btn ${isSelected}" onclick="toggleOptionSelection(this, '${item.id}')">${opt}</button>`;
-                    }).join('');
+                let contentHtml = '';
+
+                if (item.isOptionGrid) {
+                    // Render actual option-item buttons (accordion style)
+                    contentHtml = `
+                        <div class="accordion-options-grid" style="grid-template-columns: repeat(2, 1fr);">
+                            ${carOptions.map(opt => {
+                                const isSelected = savedOptionNames.includes(opt.name);
+                                return `
+                                    <button class="option-item ${isSelected ? 'selected' : ''}"
+                                        role="listitem"
+                                        onclick="toggleOption(this)"
+                                        aria-pressed="${isSelected}"
+                                        data-price="${opt.price}"
+                                        data-icon="${opt.icon}">
+                                        <span class="opt-name">${opt.name}</span>
+                                        <span class="opt-price" style="font-size: 0.8rem; color: #94a3b8; margin-left: 4px;">+${opt.price.toLocaleString()}원</span>
+                                    </button>
+                                `;
+                            }).join('')}
+                        </div>
+                    `;
                 } else {
-                    // Single Select
-                    optionsHtml = item.options.map(opt => {
-                        const isSelected = item.currentValue === opt ? 'selected' : '';
-                        return `<button class="accordion-option-btn ${isSelected}" onclick="selectAccordionOption(this, '${item.id}')">${opt}</button>`;
-                    }).join('');
+                    // Regular accordion options
+                    contentHtml = `
+                        <div class="accordion-options-grid ${item.id === 'region' ? 'full-width' : ''}">
+                            ${item.options.map(opt => {
+                                const isSelected = item.currentValue === opt ? 'selected' : '';
+                                return `<button class="accordion-option-btn ${isSelected}" onclick="selectAccordionOption(this, '${item.id}')">${opt}</button>`;
+                            }).join('')}
+                        </div>
+                    `;
                 }
 
                 return `
@@ -1064,18 +1219,111 @@ function openQuoteDetail(quoteId) {
                         <i class="fas fa-chevron-down"></i>
                     </button>
                     <div class="accordion-content">
-                        <div class="accordion-options-grid ${item.id === 'region' ? 'full-width' : ''}">
-                            ${optionsHtml}
-                        </div>
+                        ${contentHtml}
                     </div>
                 </div>
                 `;
             }).join('');
+
+            // 재견적 요청하기 버튼 추가 (기존 버튼 제거 후 추가)
+            const existingRequoteBtn = document.querySelector('.requote-btn-container');
+            if (existingRequoteBtn) {
+                existingRequoteBtn.remove();
+            }
+
+            accordionContainer.insertAdjacentHTML('afterend', `
+                <div class="requote-btn-container" style="margin-top: 1.5rem; text-align: center;">
+                    <button class="btn-requote" onclick="requestRequote()">
+                        <i class="fas fa-sync-alt"></i>
+                        재견적 요청하기
+                    </button>
+                </div>
+            `);
         }
 
-        // Price
-        const totalPrice = document.getElementById('detailTotalPrice');
-        if (totalPrice) totalPrice.textContent = (quote.totalPrice || quote.car.basePrice).toLocaleString() + '원';
+        // Price - Conditional Rendering based on Admin Final Price
+        const priceContainer = document.getElementById('detailTotalPrice')?.parentElement;
+        console.log('[PRICE] priceContainer found:', !!priceContainer);
+
+        if (priceContainer) {
+            // Determine what to show
+            let showAILoading;
+
+            console.log('[DEBUG] quote.adminFinalPrice:', quote.adminFinalPrice);
+            console.log('[DEBUG] window.testAILoadingMode:', window.testAILoadingMode);
+
+            if (quote.adminFinalPrice) {
+                // If admin has entered final price, always show it
+                showAILoading = false;
+                console.log('[DEBUG] Branch: Admin has final price, showing final price');
+            } else if (window.testAILoadingMode === true) {
+                // Explicitly requested AI loading
+                showAILoading = true;
+                console.log('[DEBUG] Branch: Explicitly showing AI loading');
+            } else if (window.testAILoadingMode === false) {
+                // Explicitly requested final price (test mode)
+                showAILoading = false;
+                console.log('[DEBUG] Branch: Explicitly showing test final price');
+            } else {
+                // Default: show AI loading when no final price
+                showAILoading = true;
+                console.log('[DEBUG] Branch: Default AI loading');
+            }
+
+            console.log('[DEBUG] Final decision - showAILoading:', showAILoading);
+
+            if (!showAILoading) {
+                // Show actual final price (or test price)
+                const displayPrice = quote.adminFinalPrice || (quote.totalPrice || quote.car.basePrice);
+                const isTestPrice = !quote.adminFinalPrice;
+
+                priceContainer.innerHTML = `
+                    <span class="label">최종 월 렌탈료</span>
+                    <h1 class="price" id="detailTotalPrice">${displayPrice.toLocaleString()}원</h1>
+                    ${isTestPrice ? '<p style="font-size: 0.85rem; color: #EF4444; margin-top: 0.5rem;">⚠️ 테스트 가격 (어드민 미입력)</p>' : ''}
+                `;
+                priceContainer.classList.remove('ai-loading-state');
+            } else {
+                // Show AI Loading State with 3D Graphics
+                const estimatedPrice = quote.totalPrice || quote.car.basePrice || 0;
+                priceContainer.innerHTML = `
+                    <div class="ai-loading-overlay">
+                        <!-- Background Blur Text with Price -->
+                        <div class="ai-bg-text">${estimatedPrice.toLocaleString()}원</div>
+                        
+                        <!-- 3D AI Icon -->
+                        <div class="ai-3d-icon">
+                            <div class="ai-cube">
+                                <div class="cube-face front"><i class="fas fa-brain"></i></div>
+                                <div class="cube-face back"></div>
+                                <div class="cube-face right"></div>
+                                <div class="cube-face left"></div>
+                                <div class="cube-face top"></div>
+                                <div class="cube-face bottom"></div>
+                            </div>
+                        </div>
+                        
+                        <!-- Compact Message -->
+                        <p class="ai-compact-message">
+                            <strong>AI 견적 분석 중...</strong><br>
+                            <span class="ai-sub-text">최적의 견적을 산출하고 있어요</span>
+                        </p>
+                        
+                        <!-- Mini Progress -->
+                        <div class="ai-mini-progress">
+                            <div class="ai-mini-fill"></div>
+                        </div>
+                    </div>
+                `;
+                priceContainer.classList.add('ai-loading-state');
+            }
+        }
+
+        // Render FAQ and Documents sections
+        console.log('[openQuoteDetail] About to render FAQ and Documents');
+        renderFAQ();
+        renderDocs('personal');
+        console.log('[openQuoteDetail] Rendering complete');
     }
 }
 
@@ -1120,6 +1368,29 @@ function toggleOptionSelection(btn, type) {
     if (headerValue) headerValue.textContent = `${count}개 선택됨`;
 }
 
+// Toggle option in detail view
+function toggleOption(btn) {
+    const isSelected = btn.classList.contains('selected');
+
+    if (isSelected) {
+        btn.classList.remove('selected');
+        btn.setAttribute('aria-pressed', 'false');
+    } else {
+        btn.classList.add('selected');
+        btn.setAttribute('aria-pressed', 'true');
+    }
+
+    // Update accordion header count
+    const optionGrid = btn.closest('.accordion-options-grid');
+    if (optionGrid) {
+        const selectedCount = optionGrid.querySelectorAll('.option-item.selected').length;
+        const headerValue = document.getElementById('value-options');
+        if (headerValue) {
+            headerValue.textContent = `${selectedCount}개 선택됨`;
+        }
+    }
+}
+
 function closeQuoteDetail() {
     // 1. Hide Detail View
     const detailView = document.getElementById('quoteDetailView');
@@ -1134,6 +1405,208 @@ function closeQuoteDetail() {
     // Refresh list in case of changes
     renderSavedQuotes();
 }
+
+// Request re-quote (Opens confirmation modal)
+window.requestRequote = function () {
+    if (!currentViewingQuoteId) {
+        if (window.Toast) {
+            Toast.error('견적 정보를 불러올 수 없습니다.');
+        }
+        return;
+    }
+
+    const quotes = JSON.parse(localStorage.getItem('savedQuotes') || '[]');
+    const quote = quotes.find(q => q.id === currentViewingQuoteId);
+
+    if (!quote) {
+        if (window.Toast) {
+            Toast.error('견적 정보를 찾을 수 없습니다.');
+        }
+        return;
+    }
+
+    // Open confirmation modal
+    openRequoteConfirmModal();
+};
+
+// Open requote confirmation modal
+function openRequoteConfirmModal() {
+    const modal = document.getElementById('requoteConfirmModal');
+    if (modal) {
+        modal.classList.remove('hidden');
+        setTimeout(() => modal.classList.add('active'), 10);
+    }
+}
+
+// Close requote confirmation modal
+function closeRequoteConfirmModal() {
+    const modal = document.getElementById('requoteConfirmModal');
+    if (modal) {
+        modal.classList.remove('active');
+        setTimeout(() => modal.classList.add('hidden'), 300);
+    }
+}
+
+// Confirm requote (actual processing)
+function confirmRequote() {
+    if (!currentViewingQuoteId) {
+        closeRequoteConfirmModal();
+        return;
+    }
+
+    const quotes = JSON.parse(localStorage.getItem('savedQuotes') || '[]');
+    const quote = quotes.find(q => q.id === currentViewingQuoteId);
+
+    if (!quote) {
+        closeRequoteConfirmModal();
+        return;
+    }
+
+    // 현재 상세 페이지에서 선택된 옵션들 수집
+    const selectedOptionsList = [];
+    const selectedOptionElements = document.querySelectorAll('.option-item.selected');
+    selectedOptionElements.forEach(opt => {
+        const optionName = opt.querySelector('.opt-name')?.textContent || '';
+        const optionPrice = parseInt(opt.dataset.price || 0);
+        const optionIcon = opt.dataset.icon || 'fa-check';
+
+        if (optionName) {
+            selectedOptionsList.push({
+                name: optionName,
+                price: optionPrice,
+                icon: optionIcon
+            });
+        }
+    });
+
+    // 조건 정보 수집
+    const selectedConditions = {
+        term: document.getElementById('value-term')?.textContent || '60개월',
+        mileage: document.getElementById('value-mileage')?.textContent || '10,000km',
+        deposit: document.getElementById('value-deposit')?.textContent || '30%',
+        region: document.getElementById('value-region')?.textContent || '서울/경기'
+    };
+
+    // 총 가격 재계산
+    const optionsTotal = selectedOptionsList.reduce((sum, opt) => sum + opt.price, 0);
+    const totalPrice = quote.car.basePrice + optionsTotal;
+
+    console.log('[confirmRequote] Selected options list:', selectedOptionsList);
+    console.log('[confirmRequote] Selected conditions:', selectedConditions);
+    console.log('[confirmRequote] Original quote:', quote);
+
+    // 1. savedQuotes 업데이트 (기존 견적 업데이트 - 1개 유지)
+    const savedQuotes = JSON.parse(localStorage.getItem('savedQuotes') || '[]');
+    const existingIndex = savedQuotes.findIndex(q => q.id === currentViewingQuoteId);
+
+    const updatedQuoteData = {
+        id: currentViewingQuoteId,  // 기존 ID 유지
+        timestamp: quote.timestamp,  // 원본 생성 시간 유지
+        car: quote.car,
+        options: selectedOptionsList.length > 0 ? selectedOptionsList : (quote.options || []),
+        totalPrice: totalPrice,
+        customerPhone: quote.customerPhone,
+        selectedOptions: selectedConditions,
+        lastUpdated: Date.now()  // 마지막 업데이트 시간
+    };
+
+    if (existingIndex !== -1) {
+        savedQuotes[existingIndex] = updatedQuoteData;  // 기존 견적 업데이트
+        console.log('[confirmRequote] Updated existing quote in savedQuotes');
+    } else {
+        savedQuotes.push(updatedQuoteData);  // 혹시 없으면 추가
+        console.log('[confirmRequote] Added new quote to savedQuotes');
+    }
+    localStorage.setItem('savedQuotes', JSON.stringify(savedQuotes));
+
+    // 2. adminQuotes에 새로운 재견적 이력 추가 (이력 관리용)
+    const adminQuotes = JSON.parse(localStorage.getItem('adminQuotes') || '[]');
+    const adminQuoteData = {
+        id: 'requote_' + Date.now(),  // 새로운 ID (이력 추적용)
+        timestamp: Date.now(),
+        car: quote.car,
+        options: selectedOptionsList.length > 0 ? selectedOptionsList : (quote.options || []),
+        totalPrice: totalPrice,
+        customerPhone: quote.customerPhone,
+        isRequote: true,  // 재견적 플래그
+        originalQuoteId: currentViewingQuoteId,  // 원본 견적 ID
+        selectedOptions: selectedConditions,
+        requoteReason: '고객 옵션/조건 변경'
+    };
+    adminQuotes.push(adminQuoteData);
+    localStorage.setItem('adminQuotes', JSON.stringify(adminQuotes));
+
+    // 3. requoteRequests에 저장 (히스토리용)
+    const requoteRequests = JSON.parse(localStorage.getItem('requoteRequests') || '[]');
+    requoteRequests.push({
+        id: adminQuoteData.id,
+        quoteId: currentViewingQuoteId,
+        carName: quote.car.name,
+        originalPrice: quote.totalPrice,
+        newPrice: totalPrice,
+        selectedOptions: selectedConditions,
+        timestamp: Date.now(),
+        status: 'pending'
+    });
+    localStorage.setItem('requoteRequests', JSON.stringify(requoteRequests));
+
+    console.log('[confirmRequote] Updated quote saved to savedQuotes:', updatedQuoteData);
+    console.log('[confirmRequote] New requote history added to adminQuotes:', adminQuoteData);
+
+    // Close modal and show success message
+    closeRequoteConfirmModal();
+
+    setTimeout(() => {
+        if (window.Toast) {
+            Toast.success('재견적 요청이 저장되었습니다!');
+        } else {
+            alert('재견적 요청이 저장되었습니다!');
+        }
+
+        // 견적 보관함 새로고침
+        renderSavedQuotes();
+    }, 300);
+}
+
+// Submit quote to admin
+window.submitQuoteToAdmin = function () {
+    // Check if we have a quote being viewed
+    if (!currentViewingQuoteId) {
+        alert('견적 정보를 불러올 수 없습니다.');
+        return;
+    }
+
+    // Get currently viewing quote
+    const savedQuotes = JSON.parse(localStorage.getItem('savedQuotes') || '[]');
+    const currentQuote = savedQuotes.find(q => q.id === currentViewingQuoteId);
+
+    if (!currentQuote) {
+        alert('견적 정보를 찾을 수 없습니다.');
+        return;
+    }
+
+    // Check if already submitted
+    const adminQuotes = JSON.parse(localStorage.getItem('adminQuotes') || '[]');
+    const alreadySubmitted = adminQuotes.find(q => q.id === currentQuote.id);
+
+    if (alreadySubmitted) {
+        alert('이미 상담 신청이 완료된 견적입니다.');
+        return;
+    }
+
+    // Add to admin quotes
+    adminQuotes.push({
+        ...currentQuote,
+        submittedAt: new Date().getTime()
+    });
+    localStorage.setItem('adminQuotes', JSON.stringify(adminQuotes));
+
+    // Success feedback
+    alert('✅ 상담 신청이 완료되었습니다!\n\n전문 상담원이 최적의 견적을 산출하여 곧 연락드리겠습니다.');
+
+    // Optional: Close detail view and return to list
+    closeQuoteDetail();
+};
 
 // --- Timer ---
 function initTimer(carId) {
@@ -1176,18 +1649,50 @@ function initTimer(carId) {
 function initDocTabs() {
     renderDocs('personal');
 }
-window.switchDocTab = function (type) {
-    document.querySelectorAll('.doc-tab').forEach(b => b.classList.remove('active'));
-    event.target.classList.add('active');
+window.switchDocTab = function (type, event) {
+    // Find the closest doc-tabs container to properly scope the active state
+    const clickedTab = event?.target || window.event?.target;
+    if (clickedTab) {
+        const tabsContainer = clickedTab.closest('.doc-tabs');
+        if (tabsContainer) {
+            // Only update tabs within the same container
+            tabsContainer.querySelectorAll('.doc-tab').forEach(b => b.classList.remove('active'));
+            clickedTab.classList.add('active');
+        }
+    }
+
+    // Render docs to all containers
     renderDocs(type);
 };
 
 // --- Saved Quotes Render Logic ---
 function renderSavedQuotes() {
-    const quotes = JSON.parse(localStorage.getItem('savedQuotes') || '[]');
+    const allQuotes = JSON.parse(localStorage.getItem('savedQuotes') || '[]');
     const container = document.getElementById('savedQuotesList');
 
     if (!container) return;
+
+    // 현재 로그인한 사용자의 전화번호 가져오기
+    const loginData = localStorage.getItem('customerLogin');
+    let currentUserPhone = null;
+
+    if (loginData) {
+        const parsed = JSON.parse(loginData);
+        currentUserPhone = parsed.phone;
+    }
+
+    // 로그인하지 않은 경우
+    if (!currentUserPhone) {
+        container.innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-sign-in-alt"></i>
+                <p>견적 보관함을 이용하려면 로그인이 필요합니다.</p>
+            </div>`;
+        return;
+    }
+
+    // 현재 로그인한 사용자의 견적만 필터링
+    const quotes = allQuotes.filter(q => q.customerPhone === currentUserPhone);
 
     if (quotes.length === 0) {
         container.innerHTML = `
@@ -1242,14 +1747,20 @@ function renderDocs(type) {
         business: ['사업자등록증', '부가세과세표준증명', '사업용 계좌'],
         corporate: ['법인등기부등본', '재무제표', '법인인감']
     };
-    document.getElementById('doc-content').innerHTML = data[type].map(item =>
+
+    const html = data[type].map(item =>
         `<div style="padding:10px; background:#F9FAFB; margin-bottom:4px; border-radius:6px;">✅ ${item}</div>`
     ).join('');
+
+    // 모든 doc-content 컨테이너에 렌더링 (여러 페이지에 있을 수 있음)
+    const containers = document.querySelectorAll('#doc-content, .doc-content');
+    console.log(`[renderDocs] Found ${containers.length} document containers for type: ${type}`);
+    containers.forEach((el, index) => {
+        console.log(`[renderDocs] Rendering to container ${index + 1}:`, el);
+        el.innerHTML = html;
+    });
 }
 function renderFAQ() {
-    const list = document.getElementById('faqList');
-    if (!list) return;
-
     const faqs = [
         {
             question: '초기비용 0원 가능한가요?',
@@ -1273,7 +1784,7 @@ function renderFAQ() {
         }
     ];
 
-    list.innerHTML = faqs.map((faq, index) => `
+    const html = faqs.map((faq, index) => `
         <div class="faq-card" data-index="${index}">
             <div class="faq-question">
                 <span class="faq-icon">${faq.icon}</span>
@@ -1287,20 +1798,35 @@ function renderFAQ() {
         </div>
     `).join('');
 
-    // 아코디언 클릭 이벤트
-    document.querySelectorAll('.faq-card').forEach(card => {
-        card.addEventListener('click', function () {
-            const isActive = this.classList.contains('active');
+    // 모든 faq-list 컨테이너에 렌더링 (여러 페이지에 있을 수 있음)
+    const lists = document.querySelectorAll('#faqList, .faq-list');
+    console.log(`[renderFAQ] Found ${lists.length} FAQ containers`);
 
-            // 다른 모든 카드 닫기
-            document.querySelectorAll('.faq-card').forEach(c => c.classList.remove('active'));
+    lists.forEach((list, listIndex) => {
+        console.log(`[renderFAQ] Rendering to container ${listIndex + 1}:`, list);
+        list.innerHTML = html;
 
-            // 클릭한 카드만 토글
-            if (!isActive) {
-                this.classList.add('active');
-            }
+        // 아코디언 클릭 이벤트 (각 list 내부의 카드에만)
+        list.querySelectorAll('.faq-card').forEach(card => {
+            // 이미 이벤트가 추가되었는지 확인
+            if (card.hasAttribute('data-event-added')) return;
+            card.setAttribute('data-event-added', 'true');
+
+            card.addEventListener('click', function () {
+                const isActive = this.classList.contains('active');
+
+                // 같은 list 내의 다른 카드들만 닫기
+                list.querySelectorAll('.faq-card').forEach(c => c.classList.remove('active'));
+
+                // 클릭한 카드만 토글
+                if (!isActive) {
+                    this.classList.add('active');
+                }
+            });
         });
     });
+
+    console.log('[renderFAQ] Rendering complete');
 }
 
 // --- REVIEWS VIEW LOGIC ---
@@ -1426,10 +1952,8 @@ function checkLoginStatus() {
 
 // Show login popup
 function showLoginPopup() {
-    // [Temporary Disable] User Request
-    // document.getElementById('loginOverlay').classList.add('active');
-    // document.getElementById('loginPopup').classList.add('active');
-    console.log('Login popup disabled by user request');
+    document.getElementById('loginOverlay').classList.add('active');
+    document.getElementById('loginPopup').classList.add('active');
 }
 
 // Close login popup (only if clicking overlay, not popup content)

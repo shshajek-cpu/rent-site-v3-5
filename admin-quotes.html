@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>견적 관리 - Admin</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
+    <link rel="stylesheet" href="admin.css">
+</head>
+
+<body>
+    <div class="admin-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo-area">
+                <h2>Admin</h2>
+            </div>
+            <nav class="side-nav">
+                <a href="admin-list.html" class="nav-link">
+                    <i class="fas fa-list"></i>
+                    차량 목록 관리
+                </a>
+                <a href="admin-quotes.html" class="nav-link active">
+                    <i class="fas fa-file-invoice"></i>
+                    견적 관리
+                </a>
+                <a href="admin-reviews.html" class="nav-link">
+                    <i class="fas fa-star"></i>
+                    출고 후기
+                </a>
+                <a href="admin-home.html" class="nav-link">
+                    <i class="fas fa-home"></i>
+                    홈 설정
+                </a>
+                <a href="admin-inquiries.html" class="nav-link">
+                    <i class="fas fa-phone-alt"></i>
+                    신규 접수 DB
+                </a>
+            </nav>
+            <div style="margin-top: auto; padding-top: 2rem;">
+                <a href="landing.html" class="nav-link">
+                    <i class="fas fa-rocket"></i>
+                    랜딩페이지 이동
+                </a>
+                <a href="index.html" class="nav-link">
+                    <i class="fas fa-external-link-alt"></i>
+                    메인 사이트 이동
+                </a>
+                <div style="border-top: 1px solid rgba(255,255,255,0.1); margin: 1rem 0;"></div>
+                <button onclick="logout()" class="nav-link"
+                    style="width: 100%; background: none; border: none; cursor: pointer; text-align: left;">
+                    <i class="fas fa-sign-out-alt"></i>
+                    로그아웃
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="content-area">
+            <header class="content-header">
+                <h1>견적 관리</h1>
+                <p>고객이 제출한 견적 요청을 관리합니다.</p>
+            </header>
+
+            <!-- Stats Cards -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3>전체 견적</h3>
+                    <div class="value" id="totalQuotes">0</div>
+                    <i class="fas fa-file-invoice"></i>
+                </div>
+                <div class="stat-card">
+                    <h3>분석중</h3>
+                    <div class="value" id="pendingQuotes">0</div>
+                    <i class="fas fa-clock"></i>
+                </div>
+                <div class="stat-card">
+                    <h3>완료</h3>
+                    <div class="value" id="completedQuotes">0</div>
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="stat-card">
+                    <h3>재견적 요청</h3>
+                    <div class="value" id="requoteCount" style="color: #DC2626;">0</div>
+                    <i class="fas fa-sync-alt" style="color: #DC2626;"></i>
+                </div>
+            </div>
+
+            <!-- Table -->
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>견적 번호</th>
+                            <th>고객 번호</th>
+                            <th>제출일시</th>
+                            <th>차량</th>
+                            <th>등급</th>
+                            <th>약정개월</th>
+                            <th>약정거리</th>
+                            <th>옵션</th>
+                            <th>최종 렌탈료</th>
+                            <th>상태</th>
+                            <th>관리</th>
+                        </tr>
+                    </thead>
+                    <tbody id="quotesTableBody">
+                        <!-- JS로 렌더링됨 -->
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <!-- Edit Quote Modal -->
+    <div class="modal-overlay" id="editQuoteModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>최종 렌탈료 입력</h2>
+                <button class="modal-close" onclick="closeEditModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <form id="editQuoteForm" onsubmit="saveQuoteFinalPrice(event)">
+                <div class="form-group">
+                    <label>차량 정보</label>
+                    <div id="modalCarInfo"
+                        style="padding: 1rem; background: rgba(255,255,255,0.05); border-radius: 6px; margin-bottom: 1rem;">
+                        <!-- Dynamic content -->
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="finalPrice">최종 월 렌탈료 (원)</label>
+                    <input type="number" id="finalPrice" required placeholder="예: 680000">
+                </div>
+
+                <input type="hidden" id="editQuoteId">
+
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary" onclick="closeEditModal()">취소</button>
+                    <button type="submit" class="btn-primary">저장</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="admin-quotes.js"></script>
+</body>
+
+</html>

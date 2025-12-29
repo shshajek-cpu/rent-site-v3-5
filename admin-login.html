@@ -9,6 +9,15 @@
         href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.8/dist/web/static/pretendard.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        :root {
+            --admin-bg: #0B0F1A;
+            --primary-color: #DC2626;
+            --primary-glow: 0 0 20px rgba(220, 38, 38, 0.4);
+            --card-bg: rgba(17, 24, 39, 0.7);
+            --text-main: #F9FAFB;
+            --text-sub: #9CA3AF;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -17,55 +26,63 @@
         }
 
         body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background-color: var(--admin-bg);
+            background-image: 
+                radial-gradient(circle at 15% 50%, rgba(220, 38, 38, 0.08), transparent 25%),
+                radial-gradient(circle at 85% 30%, rgba(59, 130, 246, 0.05), transparent 25%);
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
             padding: 20px;
+            color: var(--text-main);
         }
 
         .login-container {
-            background: white;
-            border-radius: 16px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            padding: 3rem;
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 24px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+            padding: 3.5rem;
             width: 100%;
-            max-width: 420px;
-            animation: fadeIn 0.5s ease;
+            max-width: 440px;
+            animation: fadeIn 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+            position: relative;
+            overflow: hidden;
         }
 
         @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(-20px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(20px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
         }
 
         .login-header {
             text-align: center;
-            margin-bottom: 2rem;
+            margin-bottom: 2.5rem;
         }
 
         .login-header i {
-            font-size: 3rem;
-            color: #667eea;
-            margin-bottom: 1rem;
+            font-size: 3.5rem;
+            background: linear-gradient(135deg, #fff, #999);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1.5rem;
+            filter: drop-shadow(0 0 10px rgba(255,255,255,0.2));
         }
 
         .login-header h1 {
-            font-size: 1.8rem;
-            color: #1E293B;
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--text-main);
             margin-bottom: 0.5rem;
+            letter-spacing: -0.02em;
         }
 
         .login-header p {
-            color: #64748B;
+            color: var(--text-sub);
             font-size: 0.95rem;
         }
 
@@ -75,25 +92,29 @@
 
         label {
             display: block;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.75rem;
             font-weight: 600;
-            color: #334155;
-            font-size: 0.95rem;
+            color: var(--text-sub);
+            font-size: 0.9rem;
+            letter-spacing: 0.02em;
         }
 
         input {
             width: 100%;
-            padding: 0.9rem 1rem;
-            border: 2px solid #E2E8F0;
-            border-radius: 8px;
+            padding: 1rem 1.25rem;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
             font-size: 1rem;
-            transition: all 0.3s;
+            color: white;
+            transition: all 0.3s ease;
         }
 
         input:focus {
             outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+            border-color: var(--primary-color);
+            background: rgba(0, 0, 0, 0.5);
+            box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.2), 0 0 20px rgba(220, 38, 38, 0.1);
         }
 
         .password-wrapper {
@@ -102,86 +123,93 @@
 
         .toggle-password {
             position: absolute;
-            right: 1rem;
+            right: 1.25rem;
             top: 50%;
             transform: translateY(-50%);
             cursor: pointer;
-            color: #94A3B8;
+            color: var(--text-sub);
             transition: color 0.2s;
         }
 
         .toggle-password:hover {
-            color: #667eea;
+            color: white;
         }
 
         .btn-login {
             width: 100%;
             padding: 1rem;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, var(--primary-color) 0%, #991B1B 100%);
             color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 1rem;
-            font-weight: 600;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 700;
             cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
-            margin-top: 1rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            margin-top: 1.5rem;
+            box-shadow: var(--primary-glow);
+            letter-spacing: 0.02em;
         }
 
         .btn-login:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+            box-shadow: 0 0 30px rgba(220, 38, 38, 0.6);
+            filter: brightness(1.1);
         }
 
         .btn-login:active {
-            transform: translateY(0);
+            transform: translateY(1px);
         }
 
         .error-message {
-            background: #FEE2E2;
-            color: #DC2626;
-            padding: 0.8rem;
-            border-radius: 6px;
-            margin-bottom: 1rem;
-            font-size: 0.9rem;
+            background: rgba(220, 38, 38, 0.1);
+            color: #F87171;
+            padding: 1rem;
+            border-radius: 12px;
+            border: 1px solid rgba(220, 38, 38, 0.2);
+            margin-bottom: 1.5rem;
+            font-size: 0.95rem;
             display: none;
-            animation: shake 0.3s;
+            align-items: center;
+            gap: 0.75rem;
+            animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both;
         }
 
         @keyframes shake {
-
-            0%,
-            100% {
-                transform: translateX(0);
-            }
-
-            25% {
-                transform: translateX(-10px);
-            }
-
-            75% {
-                transform: translateX(10px);
-            }
+            10%, 90% { transform: translate3d(-1px, 0, 0); }
+            20%, 80% { transform: translate3d(2px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+            40%, 60% { transform: translate3d(4px, 0, 0); }
         }
 
         .error-message.show {
-            display: block;
+            display: flex;
         }
 
         .demo-info {
-            background: #F0F9FF;
-            border: 1px solid #BAE6FD;
-            color: #0369A1;
-            padding: 1rem;
-            border-radius: 8px;
-            margin-top: 1.5rem;
-            font-size: 0.85rem;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            color: var(--text-sub);
+            padding: 1.25rem;
+            border-radius: 12px;
+            margin-top: 2rem;
+            font-size: 0.9rem;
             text-align: center;
+            line-height: 1.6;
         }
 
         .demo-info strong {
+            color: var(--text-main);
             display: block;
             margin-bottom: 0.5rem;
+        }
+        
+        .demo-info code {
+            background: rgba(0,0,0,0.3);
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            color: var(--primary-color);
+            font-family: monospace;
         }
     </style>
 </head>

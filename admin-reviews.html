@@ -10,22 +10,11 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="admin.css">
     <style>
-        /* Statistics Cards */
+        /* Statistics Cards - Layout specific overrides if needed */
         .stat-card {
-            background: white;
-            border-radius: 12px;
-            padding: 1.5rem;
             display: flex;
             align-items: center;
-            gap: 1rem;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-            border: 1px solid var(--border-color);
-            transition: all 0.2s;
-        }
-
-        .stat-card:hover {
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            transform: translateY(-2px);
+            gap: 1.5rem;
         }
 
         .stat-icon {
@@ -37,6 +26,7 @@
             justify-content: center;
             color: white;
             font-size: 1.5rem;
+            box-shadow: 0 0 15px rgba(0,0,0,0.3);
         }
 
         .stat-info {
@@ -44,65 +34,24 @@
         }
 
         .stat-value {
-            font-size: 2rem;
-            font-weight: 700;
-            color: #111827;
-            line-height: 1;
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin: 0;
+            background: linear-gradient(to right, #fff, #ccc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            line-height: 1.2;
         }
 
         .stat-label {
             font-size: 0.9rem;
-            color: #6B7280;
+            color: var(--text-sub);
             margin-top: 0.25rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
         }
 
-        /* Table Styles */
-        .table-container {
-            background: white;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-            border: 1px solid var(--border-color);
-        }
-
-        .data-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        .data-table thead {
-            background: #F9FAFB;
-            border-bottom: 2px solid #E5E7EB;
-        }
-
-        .data-table th {
-            padding: 1rem;
-            text-align: left;
-            font-weight: 700;
-            font-size: 0.875rem;
-            color: #111827;
-            white-space: nowrap;
-        }
-
-        .data-table tbody tr {
-            border-bottom: 1px solid #F3F4F6;
-            transition: background 0.15s;
-        }
-
-        .data-table tbody tr:hover {
-            background: #F9FAFB;
-        }
-
-        .data-table tbody tr.selected {
-            background: #FEF2F2;
-        }
-
-        .data-table td {
-            padding: 1rem;
-            font-size: 0.9rem;
-            vertical-align: middle;
-        }
-
+        /* Review specific table styles */
         .review-rating-display {
             display: flex;
             gap: 0.15rem;
@@ -111,10 +60,11 @@
 
         .review-rating-display i {
             color: #FFC107;
+            text-shadow: 0 0 10px rgba(255, 193, 7, 0.3);
         }
 
         .review-rating-display .far {
-            color: #E5E7EB;
+            color: #4B5563;
         }
 
         .review-content-cell {
@@ -122,14 +72,7 @@
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
-            color: #6B7280;
-            line-height: 1.5;
-        }
-
-        .review-content-full {
-            white-space: normal;
-            max-width: 400px;
-            line-height: 1.6;
+            color: var(--text-sub);
         }
 
         .action-buttons {
@@ -140,7 +83,7 @@
 
         .btn-icon {
             padding: 0.5rem 0.75rem;
-            border: none;
+            border: 1px solid rgba(255,255,255,0.1);
             border-radius: 6px;
             cursor: pointer;
             transition: all 0.2s;
@@ -149,175 +92,22 @@
             align-items: center;
             gap: 0.35rem;
             white-space: nowrap;
+            background: rgba(255,255,255,0.05);
+            color: var(--text-sub);
         }
 
-        .btn-edit {
-            background: #111827;
+        .btn-icon:hover {
+            background: var(--primary-color);
+            border-color: var(--primary-color);
             color: white;
-        }
-
-        .btn-edit:hover {
-            background: #1F2937;
-        }
-
-        .btn-copy {
-            background: #10B981;
-            color: white;
-        }
-
-        .btn-copy:hover {
-            background: #059669;
-        }
-
-        .btn-delete {
-            background: #EF4444;
-            color: white;
-        }
-
-        .btn-delete:hover {
-            background: #DC2626;
-        }
-
-        /* Brand Badge Styles */
-        .brand-badge {
-            display: inline-block;
-            padding: 0.4rem 0.8rem;
-            border-radius: 6px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            white-space: nowrap;
-        }
-
-        .brand-hyundai {
-            background: #E0F2FE;
-            color: #0369A1;
-        }
-
-        .brand-kia {
-            background: #DBEAFE;
-            color: #1E40AF;
-        }
-
-        .brand-genesis {
-            background: #E0E7FF;
-            color: #4338CA;
-        }
-
-        .brand-benz {
-            background: #F3F4F6;
-            color: #1F2937;
-        }
-
-        .brand-bmw {
-            background: #F0F9FF;
-            color: #0C4A6E;
+            box-shadow: 0 0 10px var(--primary-color);
         }
 
         .btn-add-review {
-            background: linear-gradient(135deg, #DC2626 0%, #BE123C 100%);
-            color: white;
-            padding: 0.8rem 1.5rem;
-            border: none;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            box-shadow: 0 2px 8px rgba(220, 38, 38, 0.25);
+            /* Inherits generic button styles but keeping the class for specificity if needed */
         }
 
-        .btn-add-review:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.35);
-        }
-
-        /* Modal Styles - using same as admin-list.html */
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 1000;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .modal-overlay.active {
-            display: flex;
-        }
-
-        .modal-content {
-            background: white;
-            border-radius: 12px;
-            padding: 2rem;
-            max-width: 600px;
-            width: 90%;
-            max-height: 80vh;
-            overflow-y: auto;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.5rem;
-            border-bottom: 1px solid #E5E7EB;
-            padding-bottom: 1rem;
-        }
-
-        .modal-header h2 {
-            margin: 0;
-            font-size: 1.5rem;
-            color: #111827;
-        }
-
-        .modal-close {
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            cursor: pointer;
-            color: #6B7280;
-            padding: 0;
-            width: 30px;
-            height: 30px;
-        }
-
-        .modal-close:hover {
-            color: #DC2626;
-        }
-
-        .form-group {
-            margin-bottom: 1rem;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 600;
-            color: #111827;
-        }
-
-        .form-group input,
-        .form-group select,
-        .form-group textarea {
-            width: 100%;
-            padding: 0.8rem;
-            border: 1px solid #E5E7EB;
-            border-radius: 6px;
-            font-size: 1rem;
-        }
-
-        .form-group textarea {
-            resize: vertical;
-            min-height: 100px;
-        }
-
+        /* Rating Input in Modal */
         .rating-input {
             display: flex;
             gap: 0.5rem;
@@ -326,50 +116,15 @@
 
         .rating-input i {
             cursor: pointer;
-            color: #E5E7EB;
-            transition: color 0.2s;
+            color: #4B5563;
+            transition: all 0.2s;
         }
 
         .rating-input i.active,
         .rating-input i:hover {
             color: #FFC107;
-        }
-
-        .modal-footer {
-            display: flex;
-            gap: 0.5rem;
-            justify-content: flex-end;
-            margin-top: 1.5rem;
-            padding-top: 1rem;
-            border-top: 1px solid #E5E7EB;
-        }
-
-        .btn-modal {
-            padding: 0.7rem 1.5rem;
-            border: none;
-            border-radius: 6px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .btn-modal-cancel {
-            background: #F3F4F6;
-            color: #111827;
-        }
-
-        .btn-modal-cancel:hover {
-            background: #E5E7EB;
-        }
-
-        .btn-modal-submit {
-            background: linear-gradient(135deg, #DC2626 0%, #BE123C 100%);
-            color: white;
-        }
-
-        .btn-modal-submit:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.35);
+            text-shadow: 0 0 15px rgba(255, 193, 7, 0.5);
+            transform: scale(1.1);
         }
 
         .empty-state {
@@ -378,30 +133,55 @@
             align-items: center;
             justify-content: center;
             text-align: center;
-            padding: 4rem 2rem;
+            padding: 6rem 2rem;
             color: var(--text-sub);
-            background: white;
+            background: var(--card-bg);
             border-radius: 12px;
             border: 1px solid var(--border-color);
+            backdrop-filter: blur(10px);
         }
 
         .empty-state i {
-            font-size: 4rem;
-            margin-bottom: 1rem;
+            font-size: 5rem;
+            margin-bottom: 1.5rem;
             opacity: 0.3;
+            color: var(--primary-color);
+        }
+
+        /* Sortable Header */
+        .sortable-header {
+            cursor: pointer;
+            user-select: none;
+            position: relative;
+            transition: color 0.2s;
+        }
+
+        .sortable-header:hover {
+            color: white;
+            text-shadow: 0 0 10px rgba(255,255,255,0.3);
+        }
+
+        .sort-icon {
+            margin-left: 0.5rem;
+            opacity: 0.3;
+            transition: all 0.2s;
+            display: inline-block;
+        }
+
+        .sortable-header.asc .sort-icon {
+            opacity: 1;
+            color: var(--primary-color);
+            transform: rotate(180deg);
+        }
+
+        .sortable-header.desc .sort-icon {
+            opacity: 1;
+            color: var(--primary-color);
         }
     </style>
 </head>
 
 <body>
-    <!-- 모바일 햄버거 메뉴 -->
-    <button class="mobile-menu-toggle" onclick="toggleSidebar()">
-        <i class="fas fa-bars"></i>
-    </button>
-
-    <!-- 오버레이 -->
-    <div class="overlay" onclick="toggleSidebar()"></div>
-
     <div class="admin-container">
         <!-- Sidebar -->
         <aside class="sidebar">
@@ -412,6 +192,10 @@
                 <a href="admin-list.html" class="nav-link">
                     <i class="fas fa-list"></i>
                     차량 목록 관리
+                </a>
+                <a href="admin-quotes.html" class="nav-link">
+                    <i class="fas fa-file-invoice"></i>
+                    견적 관리
                 </a>
                 <a href="admin-reviews.html" class="nav-link active">
                     <i class="fas fa-star"></i>
@@ -530,12 +314,16 @@
                                 <input type="checkbox" id="selectAllCheckbox" onchange="toggleSelectAll(this)"
                                        style="width: 18px; height: 18px; cursor: pointer;">
                             </th>
-                            <th style="width: 100px;">평점</th>
+                            <th class="sortable-header" id="th-rating" style="width: 100px;" onclick="toggleSort('rating')">
+                                평점 <i class="fas fa-sort sort-icon"></i>
+                            </th>
                             <th style="width: 120px;">브랜드</th>
                             <th style="width: 150px;">차량명</th>
                             <th style="width: 100px;">고객명</th>
                             <th>후기 내용</th>
-                            <th style="width: 120px;">등록일</th>
+                            <th class="sortable-header" id="th-date" style="width: 120px;" onclick="toggleSort('date')">
+                                등록일 <i class="fas fa-sort sort-icon"></i>
+                            </th>
                             <th style="width: 200px;">액션</th>
                         </tr>
                     </thead>
@@ -710,12 +498,93 @@
     <script src="toast.js"></script>
     <script src="admin.js"></script>
     <script>
-        // 사이드바 토글 함수
-        function toggleSidebar() {
-            const sidebar = document.querySelector('.sidebar');
-            const overlay = document.querySelector('.overlay');
-            sidebar.classList.toggle('active');
-            overlay.classList.toggle('active');
+        // 테이블 정렬 기능
+        let currentSort = {
+            field: null,
+            direction: null // null, 'asc', 'desc'
+        };
+
+        function toggleSort(field) {
+            const th = document.getElementById(`th-${field}`);
+            const icon = th.querySelector('.sort-icon');
+
+            // 다른 컬럼의 정렬 초기화
+            if (currentSort.field && currentSort.field !== field) {
+                const otherTh = document.getElementById(`th-${currentSort.field}`);
+                otherTh.classList.remove('asc', 'desc');
+                otherTh.querySelector('.sort-icon').className = 'fas fa-sort sort-icon';
+            }
+
+            // 정렬 방향 순환: null -> asc -> desc -> null
+            if (currentSort.field === field) {
+                if (currentSort.direction === 'asc') {
+                    currentSort.direction = 'desc';
+                    th.classList.remove('asc');
+                    th.classList.add('desc');
+                    icon.className = 'fas fa-sort-down sort-icon';
+                } else if (currentSort.direction === 'desc') {
+                    currentSort.direction = null;
+                    currentSort.field = null;
+                    th.classList.remove('desc');
+                    icon.className = 'fas fa-sort sort-icon';
+                    Toast.info('정렬이 초기화되었습니다.');
+                    renderReviewTable(); // 원래 순서로 복구
+                    return;
+                } else {
+                    currentSort.direction = 'asc';
+                    th.classList.add('asc');
+                    icon.className = 'fas fa-sort-up sort-icon';
+                }
+            } else {
+                currentSort.field = field;
+                currentSort.direction = 'asc';
+                th.classList.add('asc');
+                icon.className = 'fas fa-sort-up sort-icon';
+            }
+
+            // 정렬 적용
+            sortAndRenderTable(field, currentSort.direction);
+        }
+
+        function sortAndRenderTable(field, direction) {
+            const tbody = document.getElementById('reviewTableBody');
+            const rows = Array.from(tbody.querySelectorAll('tr'));
+
+            rows.sort((a, b) => {
+                let aVal, bVal;
+
+                if (field === 'rating') {
+                    // 평점 정렬 (별 개수 세기)
+                    aVal = a.querySelectorAll('.fas.fa-star').length;
+                    bVal = b.querySelectorAll('.fas.fa-star').length;
+                } else if (field === 'date') {
+                    // 날짜 정렬 (timestamp 속성 사용)
+                    const aDate = a.getAttribute('data-timestamp') || a.cells[6].textContent;
+                    const bDate = b.getAttribute('data-timestamp') || b.cells[6].textContent;
+                    aVal = new Date(aDate).getTime();
+                    bVal = new Date(bDate).getTime();
+                }
+
+                if (direction === 'asc') {
+                    return aVal - bVal;
+                } else {
+                    return bVal - aVal;
+                }
+            });
+
+            // 재렌더링
+            tbody.innerHTML = '';
+            rows.forEach(row => tbody.appendChild(row));
+
+            const directionText = direction === 'asc' ? '오름차순' : '내림차순';
+            const fieldText = field === 'rating' ? '평점' : '등록일';
+            Toast.info(`${fieldText} ${directionText} 정렬되었습니다.`);
+        }
+
+        function renderReviewTable() {
+            // 기존 renderReviewTable 함수가 있다면 호출
+            // 없다면 페이지 새로고침으로 원래 순서 복구
+            location.reload();
         }
     </script>
     <script src="admin-reviews.js"></script>

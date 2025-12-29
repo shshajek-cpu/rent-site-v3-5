@@ -10,132 +10,84 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="admin.css">
     <style>
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1.5rem;
+        /* Page Specific Layouts */
+        .brand-filter-buttons {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
             margin-bottom: 2rem;
         }
 
-        .stat-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        .brand-filter-btn {
+            /* Inherits base button styles from admin.css */
+            padding: 0.65rem 1.25rem;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-sub);
+        }
+
+        .brand-filter-btn:hover, .brand-filter-btn.active {
+            border-color: var(--primary-color);
             color: white;
-            padding: 1.5rem;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 0 15px rgba(220, 38, 38, 0.2);
         }
 
-        .stat-card h3 {
-            font-size: 0.9rem;
-            opacity: 0.9;
-            margin-bottom: 0.5rem;
+        .brand-filter-btn.active {
+            background: rgba(220, 38, 38, 0.15);
         }
 
-        .stat-card .stat-value {
-            font-size: 2rem;
-            font-weight: 700;
+        .brand-filter-btn .count {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 0.15rem 0.5rem;
+            border-radius: 99px;
+            font-size: 0.75rem;
+            margin-left: 0.5rem;
         }
 
         .search-bar {
-            margin-bottom: 1.5rem;
+            margin-bottom: 2rem;
+            background: var(--card-bg);
+            padding: 1rem;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
         }
 
         .search-bar input {
-            width: 100%;
-            max-width: 400px;
-            padding: 0.8rem 1rem;
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            font-size: 1rem;
+            background: transparent !important;
+            border: none !important;
+            padding: 0 !important;
         }
 
-        .table-container {
-            background: white;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        .search-bar-wrapper {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            padding: 0.5rem 1rem;
+            min-width: 250px;
         }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        thead {
-            background: var(--sidebar-bg);
-            color: white;
-        }
-
-        th,
-        td {
-            padding: 1rem;
-            text-align: left;
-        }
-
-        th {
-            font-weight: 600;
-            font-size: 0.9rem;
-        }
-
-        tbody tr {
-            border-bottom: 1px solid var(--border-color);
-            transition: background-color 0.2s;
-        }
-
-        tbody tr:hover {
-            background-color: #F8FAFC;
+        
+        .search-bar-wrapper input {
+             width: 100%;
+             background: transparent !important;
+             border: none !important;
+             outline: none;
+             box-shadow: none !important;
         }
 
         .car-image {
             width: 60px;
             height: 60px;
             object-fit: cover;
-            border-radius: 6px;
-        }
-
-        .car-icon {
-            width: 60px;
-            height: 60px;
-            background: var(--admin-bg);
-            border-radius: 6px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            color: var(--text-sub);
-        }
-
-        .brand-badge {
-            display: inline-block;
-            padding: 0.3rem 0.8rem;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: 600;
-        }
-
-        .brand-hyundai {
-            background: #E0F2FE;
-            color: #0369A1;
-        }
-
-        .brand-kia {
-            background: #FEE2E2;
-            color: #991B1B;
-        }
-
-        .brand-genesis {
-            background: #F3E8FF;
-            color: #6B21A8;
-        }
-
-        .brand-benz {
-            background: #E5E7EB;
-            color: #1F2937;
-        }
-
-        .brand-bmw {
-            background: #DBEAFE;
-            color: #1E40AF;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.1);
         }
 
         .action-buttons {
@@ -144,256 +96,51 @@
         }
 
         .btn-icon {
-            padding: 0.5rem 0.8rem;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-size: 0.9rem;
-        }
-
-        .btn-edit {
-            background: #3B82F6;
-            color: white;
-        }
-
-        .btn-edit:hover {
-            background: #2563EB;
-        }
-
-        .btn-copy {
-            background: #10B981;
-            color: white;
-        }
-
-        .btn-copy:hover {
-            background: #059669;
-        }
-
-        .btn-delete {
-            background: #EF4444;
-            color: white;
-        }
-
-        .btn-delete:hover {
-            background: #DC2626;
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 4rem 2rem;
-            color: var(--text-sub);
-        }
-
-        .empty-state i {
-            font-size: 4rem;
-            margin-bottom: 1rem;
-            opacity: 0.3;
-        }
-
-        /* Bulk Upload & Delete All Buttons */
-        .btn-bulk-upload,
-        .btn-delete-all {
-            padding: 0.7rem 1.2rem;
-            border: none;
-            border-radius: 6px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-size: 0.9rem;
+            width: 32px;
+            height: 32px;
             display: inline-flex;
             align-items: center;
-            gap: 0.5rem;
-        }
-
-        .btn-add-car {
-            background: linear-gradient(135deg, #DC2626 0%, #BE123C 100%);
-            color: white;
-            box-shadow: 0 2px 8px rgba(220, 38, 38, 0.25);
-        }
-
-        .btn-add-car:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.35);
-        }
-
-        .btn-bulk-upload {
-            background: #111827;
-            color: white;
-            box-shadow: 0 2px 8px rgba(17, 24, 39, 0.25);
-        }
-
-        .btn-bulk-upload:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(17, 24, 39, 0.35);
-        }
-
-        .btn-delete-all {
-            background: #F3F4F6;
-            color: #111827;
-            border: 1px solid #E5E7EB;
-        }
-
-        .btn-delete-all:hover {
-            background: #E5E7EB;
-            color: #DC2626;
-        }
-
-        /* Modal Styles */
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 1000;
-            align-items: center;
             justify-content: center;
+            border-radius: 6px;
+            color: var(--text-sub);
+            transition: all 0.2s;
+            background: rgba(255,255,255,0.05);
         }
 
-        .modal-overlay.active {
-            display: flex;
+        .btn-icon:hover {
+            background: var(--primary-color);
+            color: white;
+            box-shadow: 0 0 10px var(--primary-color);
         }
 
-        .modal-content {
-            background: white;
-            border-radius: 12px;
-            padding: 2rem;
-            max-width: 600px;
-            width: 90%;
-            max-height: 80vh;
-            overflow-y: auto;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.5rem;
-            border-bottom: 1px solid #E5E7EB;
-            padding-bottom: 1rem;
-        }
-
-        .modal-header h2 {
-            margin: 0;
-            font-size: 1.5rem;
-            color: #111827;
-        }
-
-        .modal-close {
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            cursor: pointer;
-            color: #6B7280;
-            padding: 0;
-            width: 30px;
-            height: 30px;
-        }
-
-        .modal-close:hover {
-            color: #DC2626;
-        }
-
+        /* Upload Area in Modal */
         .upload-area {
-            border: 2px dashed #E5E7EB;
-            border-radius: 8px;
-            padding: 2rem;
+            border: 2px dashed rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 3rem 2rem;
             text-align: center;
-            margin-bottom: 1.5rem;
-            cursor: pointer;
+            background: rgba(0,0,0,0.2);
             transition: all 0.2s;
         }
-
+        
         .upload-area:hover {
-            border-color: #DC2626;
-            background: #FEF2F2;
+            border-color: var(--primary-color);
+            background: rgba(220, 38, 38, 0.05);
         }
-
-        .upload-area.dragover {
-            border-color: #DC2626;
-            background: #FEF2F2;
-        }
-
+        
         .upload-area i {
             font-size: 3rem;
-            color: #DC2626;
+            color: var(--text-sub);
             margin-bottom: 1rem;
         }
-
-        .upload-instructions {
-            margin-top: 1.5rem;
-            padding: 1rem;
-            background: #F3F4F6;
-            border-radius: 8px;
-            font-size: 0.9rem;
-            text-align: left;
-        }
-
-        .upload-instructions h4 {
-            margin-top: 0;
-            color: #111827;
-        }
-
-        .upload-instructions code {
-            background: white;
-            padding: 0.2rem 0.4rem;
-            border-radius: 4px;
-            font-size: 0.85rem;
-            color: #DC2626;
-        }
-
-        .modal-footer {
-            display: flex;
-            gap: 0.5rem;
-            justify-content: flex-end;
-            margin-top: 1.5rem;
-            padding-top: 1rem;
-            border-top: 1px solid #E5E7EB;
-        }
-
-        .btn-modal {
-            padding: 0.7rem 1.5rem;
-            border: none;
-            border-radius: 6px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .btn-modal-cancel {
-            background: #F3F4F6;
-            color: #111827;
-        }
-
-        .btn-modal-cancel:hover {
-            background: #E5E7EB;
-        }
-
-        .btn-modal-submit {
-            background: linear-gradient(135deg, #DC2626 0%, #BE123C 100%);
-            color: white;
-        }
-
-        .btn-modal-submit:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.35);
+        
+        .upload-area:hover i {
+            color: var(--primary-color);
         }
     </style>
 </head>
 
 <body>
-    <!-- 모바일 햄버거 메뉴 -->
-    <button class="mobile-menu-toggle" onclick="toggleSidebar()">
-        <i class="fas fa-bars"></i>
-    </button>
-
-    <!-- 오버레이 -->
-    <div class="overlay" onclick="toggleSidebar()"></div>
-
     <div class="admin-container">
         <!-- Sidebar -->
         <aside class="sidebar">
@@ -404,6 +151,10 @@
                 <a href="admin-list.html" class="nav-link active">
                     <i class="fas fa-list"></i>
                     차량 목록 관리
+                </a>
+                <a href="admin-quotes.html" class="nav-link">
+                    <i class="fas fa-file-invoice"></i>
+                    견적 관리
                 </a>
                 <a href="admin-reviews.html" class="nav-link">
                     <i class="fas fa-star"></i>
@@ -443,19 +194,10 @@
                 <p>등록된 차량을 조회하고 수정/삭제할 수 있습니다.</p>
             </header>
 
-            <!-- Stats Cards -->
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <h3>전체 차량</h3>
-                    <div class="stat-value" id="totalCars">0</div>
-                </div>
-                <div class="stat-card" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
-                    <h3>평균 렌탈료</h3>
-                    <div class="stat-value" id="avgPrice">0원</div>
-                </div>
-                <div class="stat-card" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
-                    <h3>신차</h3>
-                    <div class="stat-value" id="newCars">0</div>
+            <!-- Brand Filter Buttons -->
+            <div class="brand-filter-container" style="margin-bottom: 1.5rem;">
+                <div id="brandFilterButtons" class="brand-filter-buttons">
+                    <!-- JavaScript로 동적 생성 -->
                 </div>
             </div>
 
@@ -475,6 +217,9 @@
                         <i class="fas fa-plus"></i> 개별 등록
                     </button>
                     <div class="header-actions">
+                        <button class="btn-primary" onclick="generateRandomCars()">
+                            <i class="fas fa-dice"></i> 임의생성 (10대)
+                        </button>
                         <button class="btn-primary btn-save-order" id="saveOrderBtn" onclick="saveOrder()"
                             style="display: none;">
                             <i class="fas fa-save"></i> 순서 저장
@@ -491,7 +236,7 @@
 
             <!-- Table -->
             <div class="table-container">
-                <table>
+                <table class="data-table">
                     <thead>
                         <tr>
                             <th style="width: 40px;"></th> <!-- Drag Handle Column -->
@@ -727,15 +472,6 @@
     <script src="utils.js"></script>
     <script src="toast.js"></script>
     <script src="admin.js"></script>
-    <script>
-        // 사이드바 토글 함수
-        function toggleSidebar() {
-            const sidebar = document.querySelector('.sidebar');
-            const overlay = document.querySelector('.overlay');
-            sidebar.classList.toggle('active');
-            overlay.classList.toggle('active');
-        }
-    </script>
     <script src="admin-list.js"></script>
 </body>
 

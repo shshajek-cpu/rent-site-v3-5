@@ -26,7 +26,7 @@ function showToast(message, type = 'info') {
     // Toast 요소 생성
     const toast = document.createElement('div');
     const bgColors = {
-        info: '#2563eb',
+        info: '#DC2626',
         success: '#10B981',
         warning: '#F59E0B',
         error: '#EF4444'

@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>데이터 디버깅 체크</title>
+    <style>
+        body {
+            font-family: 'Pretendard', sans-serif;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #DC2626;
+            margin-bottom: 20px;
+        }
+        h2 {
+            color: #333;
+            margin-top: 30px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #DC2626;
+        }
+        pre {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 4px;
+            overflow-x: auto;
+            border-left: 4px solid #DC2626;
+        }
+        .btn {
+            background: #DC2626;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        .btn:hover {
+            background: #B91C1C;
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .status.success {
+            background: #D1FAE5;
+            color: #065F46;
+        }
+        .status.error {
+            background: #FEE2E2;
+            color: #991B1B;
+        }
+        .status.warning {
+            background: #FEF3C7;
+            color: #92400E;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border: 1px solid #ddd;
+        }
+        th {
+            background: #DC2626;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 견적 데이터 디버깅 도구</h1>
+
+        <div>
+            <button class="btn" onclick="checkAllData()">전체 데이터 확인</button>
+            <button class="btn" onclick="clearAllData()">모든 데이터 초기화</button>
+        </div>
+
+        <h2>1. savedQuotes (견적 보관함)</h2>
+        <div id="savedQuotesStatus"></div>
+        <pre id="savedQuotesData">로딩 중...</pre>
+
+        <h2>2. adminQuotes (어드민 견적 관리)</h2>
+        <div id="adminQuotesStatus"></div>
+        <pre id="adminQuotesData">로딩 중...</pre>
+
+        <h2>3. requoteRequests (재견적 요청 히스토리)</h2>
+        <div id="requoteRequestsStatus"></div>
+        <pre id="requoteRequestsData">로딩 중...</pre>
+
+        <h2>4. 옵션 데이터 분석</h2>
+        <div id="optionsAnalysis"></div>
+    </div>
+
+    <script>
+        function checkAllData() {
+            // savedQuotes 체크
+            const savedQuotes = JSON.parse(localStorage.getItem('savedQuotes') || '[]');
+            document.getElementById('savedQuotesData').textContent = JSON.stringify(savedQuotes, null, 2);
+
+            if (savedQuotes.length === 0) {
+                document.getElementById('savedQuotesStatus').innerHTML =
+                    '<div class="status warning">⚠️ 저장된 견적이 없습니다.</div>';
+            } else {
+                document.getElementById('savedQuotesStatus').innerHTML =
+                    `<div class="status success">✅ 총 ${savedQuotes.length}개의 견적이 저장되어 있습니다.</div>`;
+            }
+
+            // adminQuotes 체크
+            const adminQuotes = JSON.parse(localStorage.getItem('adminQuotes') || '[]');
+            document.getElementById('adminQuotesData').textContent = JSON.stringify(adminQuotes, null, 2);
+
+            if (adminQuotes.length === 0) {
+                document.getElementById('adminQuotesStatus').innerHTML =
+                    '<div class="status warning">⚠️ 어드민 견적이 없습니다.</div>';
+            } else {
+                document.getElementById('adminQuotesStatus').innerHTML =
+                    `<div class="status success">✅ 총 ${adminQuotes.length}개의 어드민 견적이 있습니다.</div>`;
+            }
+
+            // requoteRequests 체크
+            const requoteRequests = JSON.parse(localStorage.getItem('requoteRequests') || '[]');
+            document.getElementById('requoteRequestsData').textContent = JSON.stringify(requoteRequests, null, 2);
+
+            if (requoteRequests.length === 0) {
+                document.getElementById('requoteRequestsStatus').innerHTML =
+                    '<div class="status warning">⚠️ 재견적 요청이 없습니다.</div>';
+            } else {
+                document.getElementById('requoteRequestsStatus').innerHTML =
+                    `<div class="status success">✅ 총 ${requoteRequests.length}개의 재견적 요청이 있습니다.</div>`;
+            }
+
+            // 옵션 분석
+            analyzeOptions(savedQuotes, adminQuotes);
+        }
+
+        function analyzeOptions(savedQuotes, adminQuotes) {
+            let html = '<table>';
+            html += '<tr><th>종류</th><th>견적 ID</th><th>차량</th><th>옵션 개수</th><th>옵션 상세</th></tr>';
+
+            // savedQuotes 분석
+            savedQuotes.forEach((quote, idx) => {
+                const optionsCount = (quote.options || []).length;
+                const optionsDetail = (quote.options || []).map(opt => opt.name).join(', ') || '-';
+                html += `<tr>
+                    <td>견적보관함</td>
+                    <td>${idx + 1}</td>
+                    <td>${quote.car.name}</td>
+                    <td>${optionsCount}개</td>
+                    <td>${optionsDetail}</td>
+                </tr>`;
+            });
+
+            // adminQuotes 분석
+            adminQuotes.forEach((quote, idx) => {
+                const optionsCount = (quote.options || []).length;
+                const optionsDetail = (quote.options || []).map(opt => opt.name).join(', ') || '-';
+                const isRequote = quote.isRequote ? '재견적' : '일반';
+                html += `<tr style="${quote.isRequote ? 'background: rgba(220, 38, 38, 0.1);' : ''}">
+                    <td>어드민 (${isRequote})</td>
+                    <td>${idx + 1}</td>
+                    <td>${quote.car.name}</td>
+                    <td>${optionsCount}개</td>
+                    <td>${optionsDetail}</td>
+                </tr>`;
+            });
+
+            html += '</table>';
+
+            if (savedQuotes.length === 0 && adminQuotes.length === 0) {
+                html = '<div class="status warning">⚠️ 분석할 데이터가 없습니다.</div>';
+            }
+
+            document.getElementById('optionsAnalysis').innerHTML = html;
+        }
+
+        function clearAllData() {
+            if (confirm('모든 견적 데이터를 삭제하시겠습니까?\n\n삭제 후:\n1. 새로 견적을 만들어주세요\n2. 옵션을 선택한 후 저장하세요\n3. 어드민 페이지에서 확인하세요')) {
+                localStorage.removeItem('savedQuotes');
+                localStorage.removeItem('adminQuotes');
+                localStorage.removeItem('requoteRequests');
+                alert('모든 데이터가 삭제되었습니다!');
+                checkAllData();
+            }
+        }
+
+        // 페이지 로드 시 자동 체크
+        window.onload = checkAllData;
+    </script>
+</body>
+</html>

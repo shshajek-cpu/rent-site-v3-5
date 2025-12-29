@@ -12,11 +12,6 @@
 </head>
 
 <body>
-    <button class="mobile-menu-toggle" onclick="toggleSidebar()">
-        <i class="fas fa-bars"></i>
-    </button>
-    <div class="overlay" onclick="toggleSidebar()"></div>
-
     <div class="admin-container">
         <aside class="sidebar">
             <div class="logo-area">
@@ -26,6 +21,10 @@
                 <a href="admin-list.html" class="nav-link">
                     <i class="fas fa-list"></i>
                     차량 목록 관리
+                </a>
+                <a href="admin-quotes.html" class="nav-link">
+                    <i class="fas fa-file-invoice"></i>
+                    견적 관리
                 </a>
                 <a href="admin-reviews.html" class="nav-link">
                     <i class="fas fa-star"></i>
@@ -41,6 +40,10 @@
                 </a>
             </nav>
             <div style="margin-top: auto; padding-top: 2rem;">
+                <a href="landing.html" class="nav-link">
+                    <i class="fas fa-rocket"></i>
+                    랜딩페이지 이동
+                </a>
                 <a href="index.html" class="nav-link">
                     <i class="fas fa-external-link-alt"></i>
                     메인 사이트 이동
@@ -111,11 +114,6 @@
     <script src="admin.js"></script>
     <script>
         protectAdminPage();
-
-        function toggleSidebar() {
-            document.querySelector('.sidebar').classList.toggle('active');
-            document.querySelector('.overlay').classList.toggle('active');
-        }
 
         // 로고 데이터 로드 및 저장 로직 (LocalStorage 활용)
         const db = JSON.parse(localStorage.getItem('carDB') || '{}');

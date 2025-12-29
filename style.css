@@ -1,50 +1,47 @@
 /* CSS Reset & Variables */
 :root {
-    /* --- [V3.5] Master Design System --- */
-    /* 🎨 Preserved Brand Colors */
+    /* --- [V7.0] Spatial Dual-Engine Design System (Engine A) --- */
+    /* 🎨 Engine A: Premium White & Dark Red */
     --primary-color: #000000;
     --primary-dark: #0f1219;
-    --cta-color: #DC2626;
-    /* Main Red Accent */
-    --cta-gradient: linear-gradient(135deg, #DC2626 0%, #B91C1C 100%);
-    --cta-dark: #991B1B;
+    --cta-color: #991B1B;
+    /* Dark Red Accent (V7.0) */
+    --cta-gradient: linear-gradient(135deg, #991B1B 0%, #7F1D1D 100%);
+    --cta-dark: #7F1D1D;
 
-    /* 🌡️ Ambient & Backgrounds */
-    --bg-color: #F9FAFB;
-    /* Keep original base */
-    --glass-surface: rgba(255, 255, 255, 0.70);
-    --glass-border: rgba(255, 255, 255, 0.65);
-    --glass-highlight: rgba(255, 255, 255, 0.9);
+    /* 🌡️ Engine A: Pure White Background */
+    --bg-color: #FFFFFF;
+    /* Pure White (V7.0) */
+    --glass-surface: rgba(255, 255, 255, 0.85);
+    --glass-border: rgba(0, 0, 0, 0.06);
+    --glass-highlight: rgba(255, 255, 255, 0.95);
 
-    /* 🌑 V3.5 Tangible Depth Shadows */
+    /* 🌑 V7.0 3D Soft Floating Shadows */
     /* Level 1: Float (Components) */
     --depth-shadow-1:
-        0 4px 6px -1px rgba(0, 0, 0, 0.05),
-        0 2px 4px -1px rgba(0, 0, 0, 0.03),
-        inset 0 1px 0 rgba(255, 255, 255, 0.8);
-    /* Inner Highlight */
+        0 4px 12px -2px rgba(0, 0, 0, 0.06),
+        0 2px 6px -1px rgba(0, 0, 0, 0.03);
 
-    /* Level 2: Levitate (Cards/Modals) */
+    /* Level 2: Soft Floating (Cards) */
     --depth-shadow-2:
-        0 20px 25px -5px rgba(0, 0, 0, 0.08),
-        0 10px 10px -5px rgba(0, 0, 0, 0.03),
-        inset 0 1px 0 rgba(255, 255, 255, 0.6);
+        0 10px 40px -10px rgba(0, 0, 0, 0.08),
+        0 4px 12px -2px rgba(0, 0, 0, 0.04);
 
-    /* Level 3: Deep Space (Dropdowns/Overlays) */
+    /* Level 3: Deep Floating (Modals/Overlays) */
     --depth-shadow-3:
-        0 25px 50px -12px rgba(0, 0, 0, 0.15),
-        inset 0 1px 0 rgba(255, 255, 255, 0.4);
+        0 20px 60px -15px rgba(0, 0, 0, 0.12),
+        0 8px 24px -4px rgba(0, 0, 0, 0.06);
 
-    /* ✨ Interaction Tokens */
-    --tap-scale: 0.96;
+    /* ✨ V7.0 Tactile Interaction Tokens */
+    --tap-scale: 0.98;
     --spring-motion: cubic-bezier(0.34, 1.56, 0.64, 1);
 
-    /* Text */
-    --text-main: #191F28;
-    --text-sub: #4E5968;
-    --text-hint: #8B95A1;
+    /* Text (V7.0 Dark Charcoal) */
+    --text-main: #111827;
+    --text-sub: #374151;
+    --text-hint: #9CA3AF;
 
-    --border-color: rgba(0, 0, 0, 0.06);
+    --border-color: #F3F4F6;
     --safe-area-bottom: env(safe-area-inset-bottom);
 }
 
@@ -82,7 +79,7 @@ body {
     /* Removed default box-shadow to blend with ambient bg */
 }
 
-/* === AMBIENT BACKGROUND === */
+/* === V7.0 PURE WHITE BACKGROUND === */
 .ambient-bg {
     position: fixed;
     top: 0;
@@ -91,15 +88,14 @@ body {
     height: 100vh;
     z-index: -1;
     overflow: hidden;
-    background: #F9FAFB;
+    background: #FFFFFF;
+    /* Pure White - Engine A */
 }
 
+/* Orb effects disabled for clean look */
 .ambient-orb {
-    position: absolute;
-    border-radius: 50%;
-    filter: blur(80px);
-    opacity: 0.5;
-    animation: floatOrb 20s infinite alternate cubic-bezier(0.4, 0, 0.2, 1);
+    display: none;
+    /* V7.0: Clean white background, no orbs */
 }
 
 .orb-1 {
@@ -260,9 +256,9 @@ body {
 .search-input-container:focus-within {
     transform: translateY(-2px) scale(1.01);
     box-shadow:
-        0 20px 40px -10px rgba(37, 99, 235, 0.15),
+        0 20px 40px -10px rgba(220, 38, 38, 0.15),
         inset 0 0 0 1px var(--cta-color);
-    border-color: rgba(37, 99, 235, 0.3);
+    border-color: rgba(220, 38, 38, 0.3);
 }
 
 .search-input-container:focus-within {
@@ -277,10 +273,11 @@ body {
     font-size: 20px;
     margin-right: 12px;
     flex-shrink: 0;
-    background: linear-gradient(135deg, #F87171 0%, #DC2626 100%);
+    background: linear-gradient(135deg, #B91C1C 0%, #991B1B 100%);
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
-    filter: drop-shadow(0 2px 4px rgba(220, 38, 38, 0.3));
+    filter: drop-shadow(0 2px 4px rgba(153, 27, 27, 0.3));
 }
 
 .search-input {
@@ -619,6 +616,13 @@ body {
     margin-bottom: 24px;
     line-height: 1.5;
     color: #111;
+}
+
+.modal-description {
+    font-size: 0.95rem;
+    color: var(--text-sub);
+    margin-bottom: 24px;
+    line-height: 1.6;
 }
 
 .modal-actions {
@@ -2915,13 +2919,13 @@ h3 {
     bottom: 100px;
     /* Above Global Navigation Bar */
     right: 20px;
-    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+    background: linear-gradient(135deg, #DC2626 0%, #B91C1C 100%);
     color: white;
     border: none;
     border-radius: 30px;
     padding: 12px 20px;
     cursor: pointer;
-    box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
+    box-shadow: 0 4px 15px rgba(220, 38, 38, 0.3);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     pointer-events: auto;
     /* Re-enable clicks for the button */
@@ -2932,7 +2936,7 @@ h3 {
 
 .fab-btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
+    box-shadow: 0 6px 20px rgba(220, 38, 38, 0.4);
 }
 
 .fab-content {
@@ -3488,7 +3492,7 @@ h3 {
 
 .grade-option:hover {
     border-color: #2563EB;
-    box-shadow: 0 2px 8px rgba(37, 99, 235, 0.1);
+    box-shadow: 0 2px 8px rgba(220, 38, 38, 0.1);
 }
 
 .grade-option.selected {
@@ -3709,13 +3713,13 @@ h3 {
     align-items: center;
     justify-content: center;
     gap: 8px;
-    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
     transition: all 0.3s;
 }
 
 .btn-create-quote-cta:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(37, 99, 235, 0.4);
+    box-shadow: 0 6px 16px rgba(220, 38, 38, 0.4);
 }
 
 .btn-create-quote-cta:active {
@@ -3778,7 +3782,7 @@ h3 {
     display: inline-block;
     font-size: 0.8rem;
     color: var(--cta-color);
-    background: rgba(37, 99, 235, 0.1);
+    background: rgba(220, 38, 38, 0.1);
     padding: 4px 10px;
     border-radius: 100px;
     font-weight: 700;
@@ -3833,7 +3837,7 @@ h3 {
     align-items: center;
     justify-content: center;
     gap: 8px;
-    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
     cursor: pointer;
     transition: all 0.2s;
 }
@@ -3924,9 +3928,45 @@ h3 {
 
 .accordion-option-btn.selected {
     border-color: var(--cta-color);
-    background: rgba(37, 99, 235, 0.05);
+    background: rgba(220, 38, 38, 0.05);
     color: var(--cta-color);
     font-weight: 700;
+}
+
+/* Option items in accordion - same style as accordion-option-btn */
+.accordion-options-grid .option-item {
+    padding: 10px;
+    border: 1px solid #e2e8f0;
+    background: white;
+    border-radius: 8px;
+    color: #64748b;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.accordion-options-grid .option-item:hover {
+    border-color: #cbd5e1;
+}
+
+.accordion-options-grid .option-item.selected {
+    border-color: var(--cta-color);
+    background: rgba(220, 38, 38, 0.05);
+    color: var(--cta-color);
+    font-weight: 700;
+}
+
+.accordion-options-grid .option-item .opt-name {
+    font-weight: inherit;
+}
+
+.accordion-options-grid .option-item.selected .opt-price {
+    color: var(--cta-color);
+    font-weight: 600;
 }
 
 /* Full width for region/options if needed */
@@ -3941,4 +3981,436 @@ h3 {
     margin-left: auto;
     margin-right: 12px;
     font-weight: 700;
+}
+
+/* ============================================
+   견적 상세보기 아코디언 다크 테마
+   ============================================ */
+.detail-accordion-container .accordion-item {
+    background: rgba(0, 0, 0, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.detail-accordion-container .accordion-item.active {
+    background: #000000;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    border-color: var(--cta-color);
+}
+
+.detail-accordion-container .accordion-header {
+    color: #ffffff;
+}
+
+.detail-accordion-container .accordion-header i {
+    color: #94a3b8;
+}
+
+.detail-accordion-container .accordion-item.active .accordion-header i {
+    color: var(--cta-color);
+}
+
+.detail-accordion-container .accordion-content {
+    background: rgba(0, 0, 0, 0.95);
+}
+
+.detail-accordion-container .accordion-item.active .accordion-content {
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* 아코디언 버튼들 다크 테마 */
+.detail-accordion-container .accordion-option-btn {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #ffffff;
+}
+
+.detail-accordion-container .accordion-option-btn:hover {
+    border-color: rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.detail-accordion-container .accordion-option-btn.selected {
+    border-color: var(--cta-color);
+    background: rgba(220, 38, 38, 0.2);
+    color: #ffffff;
+    font-weight: 700;
+}
+
+/* 옵션 아이템들 다크 테마 */
+.detail-accordion-container .accordion-options-grid .option-item {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #ffffff;
+}
+
+.detail-accordion-container .accordion-options-grid .option-item:hover {
+    border-color: rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.detail-accordion-container .accordion-options-grid .option-item.selected {
+    border-color: var(--cta-color);
+    background: rgba(220, 38, 38, 0.2);
+    color: #ffffff;
+    font-weight: 700;
+}
+
+.detail-accordion-container .accordion-options-grid .option-item .opt-price {
+    color: #94a3b8;
+}
+
+.detail-accordion-container .accordion-options-grid .option-item.selected .opt-price {
+    color: #EF4444;
+    font-weight: 600;
+}
+
+.detail-accordion-container .header-value {
+    color: #EF4444;
+}
+
+/* ============================================
+   🤖 AI Loading State (Compact 3D Design)
+   ============================================ */
+
+.detail-price-box.ai-loading-state {
+    background: linear-gradient(135deg, rgba(220, 38, 38, 0.02) 0%, rgba(239, 68, 68, 0.03) 100%);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(220, 38, 38, 0.08);
+    position: relative;
+    overflow: hidden;
+    min-height: 180px;
+    padding: 1.5rem 1.2rem;
+}
+
+.ai-loading-overlay {
+    padding: 0.8rem 0.8rem;
+    text-align: center;
+    position: relative;
+    z-index: 2;
+}
+
+/* Background Blur Text - More Subtle */
+.ai-bg-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 3rem;
+    font-weight: 900;
+    color: rgba(220, 38, 38, 0.03);
+    letter-spacing: -2px;
+    z-index: 0;
+    pointer-events: none;
+    filter: blur(6px);
+}
+
+/* 3D Cube Container - Medium Size */
+.ai-3d-icon {
+    perspective: 500px;
+    width: 50px;
+    height: 50px;
+    margin: 0 auto 0.8rem;
+    position: relative;
+    z-index: 1;
+}
+
+.ai-cube {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    transform-style: preserve-3d;
+    animation: cubeRotate 4s ease-in-out infinite;
+}
+
+.cube-face {
+    position: absolute;
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, #DC2626 0%, #EF4444 100%);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.9;
+    box-shadow:
+        0 0 18px rgba(220, 38, 38, 0.3),
+        inset 0 0 18px rgba(255, 255, 255, 0.1);
+}
+
+.cube-face i {
+    font-size: 1.5rem;
+    color: white;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+.cube-face.front {
+    transform: translateZ(25px);
+}
+
+.cube-face.back {
+    transform: rotateY(180deg) translateZ(25px);
+}
+
+.cube-face.right {
+    transform: rotateY(90deg) translateZ(25px);
+}
+
+.cube-face.left {
+    transform: rotateY(-90deg) translateZ(25px);
+}
+
+.cube-face.top {
+    transform: rotateX(90deg) translateZ(25px);
+}
+
+.cube-face.bottom {
+    transform: rotateX(-90deg) translateZ(25px);
+}
+
+/* Compact Message */
+.ai-compact-message {
+    font-size: 1rem;
+    line-height: 1.5;
+    color: #191F28;
+    margin: 0 0 0.8rem 0;
+    position: relative;
+    z-index: 1;
+}
+
+.ai-compact-message strong {
+    color: #DC2626;
+    font-weight: 700;
+    font-size: 1.1rem;
+}
+
+.ai-sub-text {
+    font-size: 0.9rem;
+    color: #6B7684;
+}
+
+/* Mini Progress Bar */
+.ai-mini-progress {
+    width: 140px;
+    height: 3px;
+    background: rgba(220, 38, 38, 0.1);
+    border-radius: 10px;
+    margin: 0 auto;
+    overflow: hidden;
+    position: relative;
+    z-index: 1;
+}
+
+.ai-mini-fill {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, #DC2626, #EF4444, #DC2626);
+    background-size: 200% 100%;
+    animation: progressFlow 1.5s linear infinite;
+    border-radius: 10px;
+}
+
+/* ============================================
+   🎬 AI 3D Animations
+   ============================================ */
+
+@keyframes cubeRotate {
+
+    0%,
+    100% {
+        transform: rotateX(0deg) rotateY(0deg);
+    }
+
+    25% {
+        transform: rotateX(180deg) rotateY(0deg);
+    }
+
+    50% {
+        transform: rotateX(180deg) rotateY(180deg);
+    }
+
+    75% {
+        transform: rotateX(0deg) rotateY(180deg);
+    }
+}
+
+@keyframes progressFlow {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    100% {
+        background-position: 200% 50%;
+    }
+}
+
+/* ============================================
+   🤖 AI Loading State - Card Mini Version
+   ============================================ */
+
+.quote-price.ai-loading-state {
+    background: linear-gradient(135deg, rgba(220, 38, 38, 0.03) 0%, rgba(239, 68, 68, 0.05) 100%);
+    border-radius: 8px;
+    padding: 0.8rem;
+    position: relative;
+    overflow: hidden;
+    min-height: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.ai-loading-overlay-mini {
+    text-align: center;
+    position: relative;
+    z-index: 2;
+}
+
+.ai-bg-text-mini {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 1.5rem;
+    font-weight: 900;
+    color: rgba(220, 38, 38, 0.04);
+    letter-spacing: -1px;
+    z-index: 0;
+    pointer-events: none;
+    filter: blur(4px);
+}
+
+.ai-spinner {
+    font-size: 1.5rem;
+    color: #DC2626;
+    margin-bottom: 0.4rem;
+}
+
+.ai-spinner i {
+    animation: spin 2s linear infinite;
+}
+
+.ai-message-mini {
+    font-size: 0.8rem;
+    color: #DC2626;
+    font-weight: 700;
+    margin: 0;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* ============================================
+   🧪 Test Toggle Button (Fixed Position)
+   ============================================ */
+
+.ai-test-toggle-btn {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    padding: 0.6rem 1.2rem;
+    background: #DC2626;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+    z-index: 9999;
+    transition: all 0.2s;
+}
+
+.ai-test-toggle-btn:hover {
+    background: #B91C1C;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(220, 38, 38, 0.4);
+}
+
+/* ============================================
+   재견적 요청 버튼
+   ============================================ */
+
+.btn-requote {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.9rem 2rem;
+    background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-requote:hover {
+    background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(220, 38, 38, 0.4);
+}
+
+.btn-requote:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 8px rgba(220, 38, 38, 0.3);
+}
+
+.btn-requote i {
+    font-size: 0.95rem;
+}
+
+/* ============================================
+   ?? V7.0 SPATIAL DUAL-ENGINE ENHANCEMENTS
+   ============================================ */
+
+/* Soft Float Animation */
+@keyframes softFloat {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-4px); }
+}
+
+/* V7.0 Tactile Button Enhancement */
+.btn-create-quote-cta:active,
+.fab-btn:active,
+.quote-action-btn:active {
+    transform: translateY(2px) scale(0.98) !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+    transition: all 0.1s ease-out;
+}
+
+/* V7.0 FAB Floating Effect */
+.fab-btn {
+    animation: softFloat 3s ease-in-out infinite;
+}
+
+.fab-btn:hover {
+    animation-play-state: paused;
+    transform: translateY(-4px) scale(1.05);
+}
+
+/* V7.0 Card Hover Enhancement */
+.brand-item:hover,
+.partner-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--depth-shadow-2);
+}
+
+/* V7.0 Search Container Enhancement */
+.search-input-container:hover {
+    transform: translateY(-1px);
+}
+
+/* V7.0 Modal Enhancement */
+.modal-content,
+.quote-detail-content {
+    box-shadow: var(--depth-shadow-3);
 }

@@ -43,7 +43,7 @@ const Toast = {
             success: { bg: '#10B981', border: '#059669' },
             error: { bg: '#EF4444', border: '#DC2626' },
             warning: { bg: '#F59E0B', border: '#D97706' },
-            info: { bg: '#3B82F6', border: '#2563EB' }
+            info: { bg: '#DC2626', border: '#B91C1C' }
         };
 
         const color = colors[type] || colors.info;

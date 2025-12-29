@@ -30,9 +30,13 @@ let dragSrcEl = null;
 let localDB = null; // In-memory DB for reordering
 let isDirty = false; // Track changes
 
+// 브랜드 필터 상태
+let currentBrandFilter = 'all'; // 'all' or brand id
+
 // 초기화
 document.addEventListener('DOMContentLoaded', function () {
     localDB = getDB(); // Load initial state
+    renderBrandFilter(); // 브랜드 필터 버튼 렌더링
     updateStats();
     renderCarList();
 
@@ -106,18 +110,23 @@ function renderCarList(searchTerm = '') {
     const db = getLocalDB(); // Use memory DB
     const tbody = document.getElementById('carTableBody');
 
-    // 1. 검색 필터링
+    // 1. 브랜드 필터링
     let filteredCars = db.cars;
+    if (currentBrandFilter !== 'all') {
+        filteredCars = filteredCars.filter(car => car.brand === currentBrandFilter);
+    }
+
+    // 2. 검색 필터링
     if (searchTerm) {
         const search = searchTerm.toLowerCase();
-        filteredCars = db.cars.filter(car =>
+        filteredCars = filteredCars.filter(car =>
             car.brand.toLowerCase().includes(search) ||
             car.name.toLowerCase().includes(search) ||
             (brandNames[car.brand] && brandNames[car.brand].toLowerCase().includes(search))
         );
     }
 
-    // 2. 정렬 로직 삭제 (이미 toggleSort에서 localDB를 정렬함)
+    // 3. 정렬 로직 삭제 (이미 toggleSort에서 localDB를 정렬함)
     // WYSIWYG: localDB 순서 그대로 렌더링
 
     // 빈 상태
@@ -268,20 +277,7 @@ function updateStats() {
     const db = getDB();
     const cars = db.cars;
 
-    // 전체 차량 수
-    document.getElementById('totalCars').textContent = cars.length;
-
-    // 평균 렌탈료
-    if (cars.length > 0) {
-        const avgPrice = Math.round(cars.reduce((sum, car) => sum + car.price, 0) / cars.length);
-        document.getElementById('avgPrice').textContent = avgPrice.toLocaleString() + '원';
-    } else {
-        document.getElementById('avgPrice').textContent = '0원';
-    }
-
-    // 신차 수
-    const newCars = cars.filter(car => car.mileage === '신차').length;
-    document.getElementById('newCars').textContent = newCars;
+    // 통계 대시보드 제거됨 (Stats dashboard removed)
 }
 
 // 차량 수정 (모달로 변경)
@@ -335,9 +331,8 @@ function deleteCar(id) {
         // localDB 동기화
         localDB = db;
 
-        // 목록 새로고침
-        renderCarList();
-        updateStats();
+        // 목록 및 필터 새로고침
+        updateCarListAndFilter();
 
         Toast.success('차량이 삭제되었습니다.');
     }
@@ -557,8 +552,7 @@ function processBulkUpload() {
     localDB = db;
 
     // UI 업데이트
-    renderCarList();
-    updateStats();
+    updateCarListAndFilter();
     closeBulkUploadModal();
 
     Toast.success(`${newCars.length}개의 차량이 등록되었습니다!`);
@@ -599,10 +593,88 @@ function deleteAllCars() {
     document.getElementById('saveOrderBtn').style.display = 'none';
 
     // UI 업데이트
-    renderCarList();
-    updateStats();
+    updateCarListAndFilter();
 
     Toast.success('모든 차량이 삭제되었습니다.');
+}
+
+// ==========================================
+// 임의 차량 생성 기능 (Random Generator)
+// ==========================================
+function generateRandomCars() {
+    const db = getDB();
+    const count = 10;
+    const brands = ['hyundai', 'kia', 'genesis', 'benz', 'bmw'];
+
+    // Reliable Images Map (Synced with script.js)
+    const CAR_IMAGES_MAP = {
+        hyundai: [
+            'https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/Hyundai_Grandeur_Calligraphy_GN7_Abyss_Black_Pearl_%282%29.jpg/640px-Hyundai_Grandeur_Calligraphy_GN7_Abyss_Black_Pearl_%282%29.jpg',
+            'https://upload.wikimedia.org/wikipedia/commons/thumb/2/22/2023_Hyundai_Santa_Fe_PHEV_%28US%29_front_view.jpg/640px-2023_Hyundai_Santa_Fe_PHEV_%28US%29_front_view.jpg',
+            'https://upload.wikimedia.org/wikipedia/commons/thumb/6/62/Hyundai_Avante_CN7_FL_Meta_Blue_Pearl_%283%29.jpg/640px-Hyundai_Avante_CN7_FL_Meta_Blue_Pearl_%283%29.jpg'
+        ],
+        kia: [
+            'https://upload.wikimedia.org/wikipedia/commons/a/aa/Kia_Sorento_MQ4_front_view_%28South_Korea%29_01.png',
+            'https://upload.wikimedia.org/wikipedia/commons/thumb/2/23/Kia_Sportage_NQ5_Gravity_Snow_White_Pearl_%281%29.jpg/640px-Kia_Sportage_NQ5_Gravity_Snow_White_Pearl_%281%29.jpg'
+        ],
+        genesis: [
+            'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/2017_Genesis_G80_3.8_HTRAC%2C_front_3.18.19.jpg/640px-2017_Genesis_G80_3.8_HTRAC%2C_front_3.18.19.jpg',
+            'https://upload.wikimedia.org/wikipedia/commons/thumb/9/90/Genesis_GV70_JK1_Mauna_Red_%281%29.jpg/640px-Genesis_GV70_JK1_Mauna_Red_%281%29.jpg'
+        ],
+        benz: [
+            'https://upload.wikimedia.org/wikipedia/commons/thumb/2/27/Mercedes-Benz_W213_E_220_d_Exclusive_front_20190722.jpg/640px-Mercedes-Benz_W213_E_220_d_Exclusive_front_20190722.jpg'
+        ],
+        bmw: [
+            'https://upload.wikimedia.org/wikipedia/commons/thumb/4/43/BMW_G30_IMG_0058.jpg/640px-BMW_G30_IMG_0058.jpg'
+        ]
+    };
+
+    const models = {
+        hyundai: ['그랜저', '쏘나타', '아반떼', '싼타페', '투싼', '팰리세이드'],
+        kia: ['K5', 'K8', '쏘렌토', '스포티지', '카니발', '셀토스'],
+        genesis: ['G70', 'G80', 'G90', 'GV70', 'GV80'],
+        benz: ['E-Class', 'C-Class', 'S-Class', 'GLE', 'GLC'],
+        bmw: ['3 Series', '5 Series', '7 Series', 'X3', 'X5']
+    };
+
+    const grades = ['프리미엄', '익스클루시브', '노블레스', '시그니처', '스포츠 패키지', 'AMG Line', 'M Sport'];
+
+    for (let i = 0; i < count; i++) {
+        const brand = brands[Math.floor(Math.random() * brands.length)];
+        const modelList = models[brand];
+        const name = modelList[Math.floor(Math.random() * modelList.length)];
+        const grade = grades[Math.floor(Math.random() * grades.length)];
+
+        // Price: Random between 300,000 and 1,500,000, rounded to 10,000
+        const price = Math.round((Math.random() * 120 + 30)) * 10000;
+
+        // Mileage: Random or '신차'
+        const isNew = Math.random() > 0.3;
+        const mileage = isNew ? '신차' : Math.floor(Math.random() * 50 + 1) * 1000 + 'km';
+
+        // Image: Pick valid image if available, else standard placeholder
+        const availableImages = CAR_IMAGES_MAP[brand];
+        const image = availableImages ? availableImages[Math.floor(Math.random() * availableImages.length)] : '';
+
+        const newId = 'car_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+
+        db.cars.push({
+            id: newId,
+            brand,
+            name,
+            grade,
+            mileage,
+            price,
+            image
+        });
+    }
+
+    saveDB(db);
+    localDB = db; // Sync memory
+
+    // Alert & Render
+    Toast.success(`차량 ${count}대가 생성되었습니다!`);
+    updateCarListAndFilter();
 }
 
 // ==========================================
@@ -725,8 +797,7 @@ document.addEventListener('DOMContentLoaded', function () {
             localDB = db;
 
             // UI 업데이트
-            renderCarList();
-            updateStats();
+            updateCarListAndFilter();
             closeAddCarModal();
 
             Toast.success(`[${brandNames[brand] || brand}] ${name} 차량이 등록되었습니다!`);
@@ -949,3 +1020,65 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 });
+
+// ==========================================
+// 브랜드 필터 기능
+// ==========================================
+
+// 브랜드 필터 버튼 렌더링
+function renderBrandFilter() {
+    const db = getDB();
+    const container = document.getElementById('brandFilterButtons');
+
+    if (!container) return;
+
+    // 각 브랜드별 차량 수 계산
+    const brandCounts = {};
+    let totalCount = 0;
+
+    db.cars.forEach(car => {
+        brandCounts[car.brand] = (brandCounts[car.brand] || 0) + 1;
+        totalCount++;
+    });
+
+    // 전체 버튼
+    let html = `
+        <button class="brand-filter-btn ${currentBrandFilter === 'all' ? 'active' : ''}"
+                onclick="filterByBrand('all')">
+            <i class="fas fa-th"></i>
+            전체
+            <span class="count">${totalCount}</span>
+        </button>
+    `;
+
+    // 브랜드별 버튼
+    db.brands.forEach(brand => {
+        const count = brandCounts[brand.id] || 0;
+        const isActive = currentBrandFilter === brand.id ? 'active' : '';
+
+        html += `
+            <button class="brand-filter-btn ${isActive}"
+                    onclick="filterByBrand('${brand.id}')">
+                <i class="fas fa-car"></i>
+                ${brand.name}
+                <span class="count">${count}</span>
+            </button>
+        `;
+    });
+
+    container.innerHTML = html;
+}
+
+// 브랜드로 필터링
+window.filterByBrand = function(brandId) {
+    currentBrandFilter = brandId;
+    renderBrandFilter(); // 버튼 상태 업데이트
+    renderCarList(); // 차량 목록 다시 렌더링
+};
+
+// 차량 데이터 변경 시 브랜드 필터도 업데이트하는 헬퍼 함수
+function updateCarListAndFilter() {
+    renderBrandFilter();
+    renderCarList();
+    updateStats();
+}
