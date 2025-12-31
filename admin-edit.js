@@ -98,7 +98,6 @@ function loadCarData() {
     document.getElementById('name').value = car.name;
     document.getElementById('grade').value = car.grade || '';
     document.getElementById('price').value = car.price;
-    document.getElementById('mileage').value = car.mileage || '';
     document.getElementById('image').value = car.image || '';
 
     // 기존 이미지가 있으면 미리보기 표시
@@ -119,7 +118,6 @@ document.getElementById('editCarForm').addEventListener('submit', function (e) {
     const name = document.getElementById('name').value;
     const grade = document.getElementById('grade').value;
     const priceValue = document.getElementById('price').value;
-    const mileage = document.getElementById('mileage').value;
     const image = document.getElementById('image').value;
 
     // 종합 검증
@@ -128,7 +126,6 @@ document.getElementById('editCarForm').addEventListener('submit', function (e) {
         name: name,
         grade: grade,
         price: priceValue,
-        mileage: mileage,
         image: image
     };
 
@@ -155,7 +152,6 @@ document.getElementById('editCarForm').addEventListener('submit', function (e) {
         brand: brand,
         name: name,
         grade: grade,
-        mileage: mileage,
         price: price,
         image: image
     };

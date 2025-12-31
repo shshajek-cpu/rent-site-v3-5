@@ -133,7 +133,7 @@ function renderCarList(searchTerm = '') {
     if (filteredCars.length === 0) {
         tbody.innerHTML = `
             <tr>
-                <td colspan="11" class="empty-state">
+                <td colspan="10" class="empty-state">
                     <i class="fas fa-inbox"></i>
                     <p>${searchTerm ? '검색 결과가 없습니다.' : '등록된 차량이 없습니다.'}</p>
                 </td>
@@ -180,8 +180,7 @@ function renderCarList(searchTerm = '') {
             <td><strong>${car.name}</strong></td>
             <td>${car.vehiclePrice ? car.vehiclePrice.toLocaleString() + '만원' : '-'}</td>
             <td>${car.grade || '-'}</td>
-            <td>${car.options || '-'}</td>
-            <td>${car.mileage || '-'}</td>
+            <td style="white-space: pre-line;">${car.options ? car.options.replace(/\n/g, '<br>') : '-'}</td>
             <td><strong>${car.price.toLocaleString()}원</strong></td>
             <td>
                 <div class="action-buttons">
@@ -298,9 +297,9 @@ function editCar(id) {
     document.getElementById('editName').value = car.name;
     document.getElementById('editVehiclePrice').value = car.vehiclePrice || '';
     document.getElementById('editGrade').value = car.grade || '';
-    document.getElementById('editOptions').value = car.options || '';
+    // 옵션 필드는 비워두고 새로운 옵션 추가용으로 사용 (기존 옵션은 테이블에서 확인 가능)
+    document.getElementById('editOptions').value = '';
     document.getElementById('editPrice').value = car.price;
-    document.getElementById('editMileage').value = car.mileage || '';
     document.getElementById('editImage').value = car.image || '';
 
     // 이미지 미리보기
@@ -385,6 +384,30 @@ document.getElementById('searchInput').addEventListener('input', function (e) {
 // 대량 등록 기능
 // ==========================================
 
+// CSV 템플릿 다운로드
+function downloadCSVTemplate() {
+    const csvContent = 'brand,name,vehiclePrice,grade,options,price,image\n' +
+                      'hyundai,그랜저,5000,프리미엄,선루프/통풍시트,680000,\n' +
+                      'hyundai,그랜저,5000,프리미엄,HUD/전동시트,720000,\n' +
+                      'hyundai,그랜저,5000,프리미엄,어라운드뷰,750000,\n' +
+                      'kia,K5,4000,노블레스,파노라마선루프,550000,\n' +
+                      'genesis,G80,7000,시그니처,HUD/통풍시트/전동시트,890000,';
+
+    const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+
+    link.setAttribute('href', url);
+    link.setAttribute('download', '차량_대량등록_양식.csv');
+    link.style.visibility = 'hidden';
+
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    Toast.success('CSV 양식이 다운로드되었습니다! (동일 차종/등급은 옵션만 추가됩니다)');
+}
+
 // 모달 열기
 function openBulkUploadModal() {
     document.getElementById('bulkUploadModal').classList.add('active');
@@ -394,7 +417,6 @@ function openBulkUploadModal() {
 // 모달 닫기
 function closeBulkUploadModal() {
     document.getElementById('bulkUploadModal').classList.remove('active');
-    document.getElementById('bulkDataInput').value = '';
     document.getElementById('csvFileInput').value = '';
 }
 
@@ -469,51 +491,45 @@ function parseCSV(csvText) {
         if (!line) continue;
 
         const parts = line.split(',').map(p => p.trim());
-        if (parts.length < 5) {
+        if (parts.length < 6) {
             Toast.warning(`${i + 1}번째 줄: 데이터가 부족합니다. 건너뜁니다.`);
             continue;
         }
 
-        const [brand, name, grade, mileage, priceStr, image] = parts;
+        const [brand, name, vehiclePriceStr, grade, options, priceStr, image] = parts;
         const price = parseInt(priceStr.replace(/[^0-9]/g, ''));
+        const vehiclePrice = vehiclePriceStr ? parseInt(vehiclePriceStr.replace(/[^0-9]/g, '')) : null;
 
         if (!price || isNaN(price)) {
-            Toast.warning(`${i + 1}번째 줄: 가격이 유효하지 않습니다. 건너뜁니다.`);
+            Toast.warning(`${i + 1}번째 줄: 렌탈료가 유효하지 않습니다. 건너뜁니다.`);
             continue;
         }
 
-        cars.push({ brand, name, grade, mileage, price, image: image || '' });
+        // 옵션과 가격을 합쳐서 저장 (예: "선루프/통풍시트 680000")
+        const optionLine = options ? `${options} ${price}` : '';
+
+        cars.push({
+            brand,
+            name,
+            vehiclePrice,
+            grade,
+            optionLine,  // 옵션+가격 결합
+            price,       // 대표 가격 (첫 번째 행 기준)
+            image: image || ''
+        });
     }
 
-    // JSON textarea에 표시
-    const jsonData = JSON.stringify(cars, null, 2);
-    document.getElementById('bulkDataInput').value = jsonData;
+    // 즉시 등록 처리
+    if (cars.length === 0) {
+        Toast.error('등록할 차량 데이터가 없습니다.');
+        return;
+    }
 
-    Toast.success(`${cars.length}개의 차량 데이터를 읽었습니다.`);
+    processBulkUploadData(cars);
 }
 
-// 대량 등록 처리
-function processBulkUpload() {
-    const jsonInput = document.getElementById('bulkDataInput').value.trim();
-
-    if (!jsonInput) {
-        Toast.error('등록할 데이터를 입력하거나 CSV 파일을 업로드하세요.');
-        return;
-    }
-
-    let newCars;
-    try {
-        newCars = JSON.parse(jsonInput);
-    } catch (e) {
-        Toast.error('JSON 형식이 올바르지 않습니다.');
-        return;
-    }
-
-    if (!Array.isArray(newCars) || newCars.length === 0) {
-        Toast.error('차량 데이터가 배열 형식이어야 하며, 최소 1개 이상이어야 합니다.');
-        return;
-    }
-
+// 대량 등록 데이터 처리
+function processBulkUploadData(newCars) {
     // 유효성 검사
     const validBrands = ['hyundai', 'kia', 'genesis', 'benz', 'bmw'];
     for (let i = 0; i < newCars.length; i++) {
@@ -532,22 +548,57 @@ function processBulkUpload() {
         }
     }
 
-    // DB에 추가
+    // DB 가져오기
     const db = getDB();
 
-    newCars.forEach((car, index) => {
-        // 문자열 UUID 생성 (개별등록/복사와 동일한 방식)
-        const newId = 'car_' + Date.now() + '_' + index + '_' + Math.random().toString(36).substr(2, 9);
+    let newCarCount = 0;
+    let optionAddCount = 0;
+    let duplicateSkipCount = 0;
 
-        db.cars.push({
-            id: newId,
-            brand: car.brand.toLowerCase(),
-            name: car.name,
-            grade: car.grade || '',
-            mileage: car.mileage || '',
-            price: car.price,
-            image: car.image || ''
-        });
+    newCars.forEach((car, index) => {
+        // 중복 차량 검색 (brand + name + grade로 판단)
+        const existingCar = db.cars.find(c =>
+            c.brand === car.brand.toLowerCase() &&
+            c.name === car.name &&
+            c.grade === (car.grade || '')
+        );
+
+        if (existingCar) {
+            // 기존 차량 발견 - 옵션만 추가
+            if (car.optionLine) {
+                // 기존 옵션 리스트 가져오기
+                const existingOptions = existingCar.options ? existingCar.options.split('\n') : [];
+
+                // 중복 체크
+                if (!existingOptions.includes(car.optionLine)) {
+                    // 중복이 아니면 줄바꿈 추가
+                    if (existingCar.options) {
+                        existingCar.options += '\n' + car.optionLine;
+                    } else {
+                        existingCar.options = car.optionLine;
+                    }
+                    optionAddCount++;
+                } else {
+                    // 중복 옵션 - 스킵
+                    duplicateSkipCount++;
+                }
+            }
+        } else {
+            // 새로운 차량 등록
+            const newId = 'car_' + Date.now() + '_' + index + '_' + Math.random().toString(36).substr(2, 9);
+
+            db.cars.push({
+                id: newId,
+                brand: car.brand.toLowerCase(),
+                name: car.name,
+                vehiclePrice: car.vehiclePrice || null,
+                grade: car.grade || '',
+                options: car.optionLine || '',
+                price: car.price,
+                image: car.image || ''
+            });
+            newCarCount++;
+        }
     });
 
     saveDB(db);
@@ -559,7 +610,15 @@ function processBulkUpload() {
     updateCarListAndFilter();
     closeBulkUploadModal();
 
-    Toast.success(`${newCars.length}개의 차량이 등록되었습니다!`);
+    // 상세 통계 메시지
+    let message = `${newCars.length}개 행 처리 완료\n`;
+    message += `• 새 차량 등록: ${newCarCount}개\n`;
+    message += `• 옵션 추가: ${optionAddCount}개`;
+    if (duplicateSkipCount > 0) {
+        message += `\n• 중복 옵션 제외: ${duplicateSkipCount}개`;
+    }
+
+    Toast.success(message);
 }
 
 // ==========================================
@@ -765,7 +824,6 @@ document.addEventListener('DOMContentLoaded', function () {
             const grade = document.getElementById('grade').value;
             const optionsValue = document.getElementById('options').value;
             const priceValue = document.getElementById('price').value;
-            const mileage = document.getElementById('mileage').value;
             const image = document.getElementById('image').value;
 
             // 기본 검증
@@ -783,6 +841,9 @@ document.addEventListener('DOMContentLoaded', function () {
             // 차량가격 처리 (선택사항)
             const vehiclePrice = vehiclePriceValue ? parseInt(vehiclePriceValue, 10) : null;
 
+            // 옵션과 가격을 결합 (예: "선루프/통풍시트 680000")
+            const optionLine = optionsValue ? `${optionsValue} ${price}` : '';
+
             // DB에 추가
             const db = getDB();
 
@@ -795,8 +856,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 name: name,
                 vehiclePrice: vehiclePrice,
                 grade: grade,
-                options: optionsValue,
-                mileage: mileage,
+                options: optionLine,
                 price: price,
                 image: image
             };
@@ -984,7 +1044,6 @@ document.addEventListener('DOMContentLoaded', function () {
             const grade = document.getElementById('editGrade').value;
             const optionsValue = document.getElementById('editOptions').value;
             const priceValue = document.getElementById('editPrice').value;
-            const mileage = document.getElementById('editMileage').value;
             const image = document.getElementById('editImage').value;
 
             // 기본 검증
@@ -1011,6 +1070,25 @@ document.addEventListener('DOMContentLoaded', function () {
                 return;
             }
 
+            // 기존 차량 정보 가져오기
+            const existingCar = db.cars[carIndex];
+
+            // 옵션 처리: 새로운 옵션 입력 시 기존에 추가
+            let finalOptions = existingCar.options || '';
+            if (optionsValue) {
+                const newOptionLine = `${optionsValue} ${price}`;
+                const existingOptions = finalOptions ? finalOptions.split('\n') : [];
+
+                // 중복 체크
+                if (!existingOptions.includes(newOptionLine)) {
+                    if (finalOptions) {
+                        finalOptions += '\n' + newOptionLine;
+                    } else {
+                        finalOptions = newOptionLine;
+                    }
+                }
+            }
+
             // 차량 정보 업데이트
             db.cars[carIndex] = {
                 id: carId,
@@ -1018,8 +1096,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 name: name,
                 vehiclePrice: vehiclePrice,
                 grade: grade,
-                options: optionsValue,
-                mileage: mileage,
+                options: finalOptions,
                 price: price,
                 image: image
             };

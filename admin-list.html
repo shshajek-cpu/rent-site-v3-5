@@ -250,7 +250,6 @@
                             <th>차량가격</th>
                             <th>등급</th>
                             <th>옵션</th>
-                            <th>주행거리</th>
                             <th class="sortable-header" onclick="toggleSort('price')" id="th-price">
                                 렌탈료 <i class="fas fa-sort sort-icon"></i>
                             </th>
@@ -319,20 +318,12 @@
                         style="width: 100%; padding: 0.8rem; border: 1px solid #E5E7EB; border-radius: 6px; font-size: 1rem;">
                 </div>
 
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
-                    <div class="form-group">
-                        <label for="price"
-                            style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #111827;">월 렌탈료
-                            (원)</label>
-                        <input type="number" id="price" placeholder="예: 600000" required
-                            style="width: 100%; padding: 0.8rem; border: 1px solid #E5E7EB; border-radius: 6px; font-size: 1rem;">
-                    </div>
-                    <div class="form-group">
-                        <label for="mileage"
-                            style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #111827;">주행거리/상태</label>
-                        <input type="text" id="mileage" value="신차" placeholder="예: 10,000km"
-                            style="width: 100%; padding: 0.8rem; border: 1px solid #E5E7EB; border-radius: 6px; font-size: 1rem;">
-                    </div>
+                <div class="form-group" style="margin-bottom: 1rem;">
+                    <label for="price"
+                        style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #111827;">월 렌탈료
+                        (원)</label>
+                    <input type="number" id="price" placeholder="예: 600000" required
+                        style="width: 100%; padding: 0.8rem; border: 1px solid #E5E7EB; border-radius: 6px; font-size: 1rem;">
                 </div>
 
                 <div class="form-group" style="margin-bottom: 1rem;">
@@ -373,40 +364,43 @@
                 </button>
             </div>
 
+            <div style="text-align: center; margin-bottom: 1.5rem;">
+                <button type="button" class="btn-modal btn-modal-submit" onclick="downloadCSVTemplate()"
+                    style="display: inline-flex; align-items: center; gap: 0.5rem;">
+                    <i class="fas fa-download"></i>
+                    대량 등록 양식 다운로드
+                </button>
+            </div>
+
             <div class="upload-area" id="uploadArea">
                 <i class="fas fa-cloud-upload-alt"></i>
                 <h3>CSV 파일을 드래그하거나 클릭하여 업로드</h3>
-                <p style="color: #6B7280; margin-top: 0.5rem;">또는 아래에 JSON 형식으로 직접 입력하세요</p>
+                <p style="color: #6B7280; margin-top: 0.5rem;">양식을 다운로드하여 작성 후 업로드하세요</p>
                 <input type="file" id="csvFileInput" accept=".csv" style="display: none;">
-            </div>
-
-            <div style="margin-bottom: 1rem;">
-                <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #111827;">
-                    JSON 형식으로 입력:
-                </label>
-                <textarea id="bulkDataInput" rows="8"
-                    style="width: 100%; padding: 0.8rem; border: 1px solid #E5E7EB; border-radius: 6px; font-family: 'Courier New', monospace; font-size: 0.85rem;"
-                    placeholder='[
-  {"brand": "hyundai", "name": "그랜저", "grade": "프리미엄", "mileage": "10,000km", "price": 680000},
-  {"brand": "kia", "name": "K5", "grade": "노블레스", "mileage": "15,000km", "price": 550000}
-]'></textarea>
             </div>
 
             <div class="upload-instructions">
                 <h4><i class="fas fa-info-circle"></i> CSV 형식 안내</h4>
                 <p>CSV 파일의 첫 줄은 헤더이며, 다음 형식을 따라야 합니다:</p>
-                <code>brand,name,grade,mileage,price</code>
-                <p style="margin-top: 0.5rem; margin-bottom: 0.5rem;">예시:</p>
-                <code>hyundai,그랜저,프리미엄,10000km,680000</code><br>
-                <code>kia,K5,노블레스,15000km,550000</code>
+                <code>brand,name,vehiclePrice,grade,options,price,image</code>
+                <p style="margin-top: 0.5rem; margin-bottom: 0.5rem;">예시 (동일 차종/등급은 옵션만 추가됨):</p>
+                <code>hyundai,그랜저,5000,프리미엄,선루프/통풍시트,680000,</code><br>
+                <code>hyundai,그랜저,5000,프리미엄,HUD/전동시트,720000,</code><br>
+                <code>hyundai,그랜저,5000,프리미엄,어라운드뷰,750000,</code><br>
+                <code>kia,K5,4000,노블레스,파노라마선루프,550000,</code>
                 <p style="margin-top: 1rem; font-size: 0.85rem; color: #6B7280;">
-                    * brand는 hyundai, kia, genesis, benz, bmw 중 하나여야 합니다.
+                    <strong style="color: #DC2626;">⚡ 중요:</strong> brand + name + grade가 같으면 차량은 추가되지 않고 옵션만 줄바꿈으로 추가됩니다.<br>
+                    * brand는 hyundai, kia, genesis, benz, bmw 중 하나여야 합니다.<br>
+                    * vehiclePrice는 만원 단위 (예: 5000 = 5,000만원), 선택사항<br>
+                    * options: 옵션명 (예: 선루프/통풍시트)<br>
+                    * price: 해당 옵션의 월 렌탈료 (원 단위), 필수<br>
+                    * 옵션은 "옵션명 가격" 형태로 저장됩니다<br>
+                    * image는 이미지 URL, 선택사항
                 </p>
             </div>
 
             <div class="modal-footer">
-                <button class="btn-modal btn-modal-cancel" onclick="closeBulkUploadModal()">취소</button>
-                <button class="btn-modal btn-modal-submit" onclick="processBulkUpload()">등록</button>
+                <button type="button" class="btn-modal btn-modal-cancel" onclick="closeBulkUploadModal()">취소</button>
             </div>
         </div>
     </div>
@@ -461,11 +455,6 @@
                     <div class="form-group">
                         <label for="editOptions">옵션</label>
                         <input type="text" id="editOptions" placeholder="예: 선루프, 통풍시트, 전동시트">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="editMileage">주행거리/상태</label>
-                        <input type="text" id="editMileage" placeholder="예: 10,000km">
                     </div>
 
                     <div class="form-group">

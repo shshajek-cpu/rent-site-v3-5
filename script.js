@@ -1743,7 +1743,6 @@ function renderSavedQuotes() {
                 <div class="quote-header">
                     <div class="quote-header-left">
                         <span class="quote-date">${new Date(quote.timestamp).toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' })}</span>
-                        <span class="quote-status-badge ${status}">${statusLabels[status]}</span>
                     </div>
                     <button class="btn-delete-quote" onclick="event.stopPropagation(); deleteQuote('${quote.id}')" title="견적 삭제">
                         <i class="fas fa-trash-alt"></i>
