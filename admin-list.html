@@ -379,15 +379,36 @@
                 <input type="file" id="csvFileInput" accept=".csv" style="display: none;">
             </div>
 
+            <div style="margin: 1.5rem 0; text-align: center; color: #6B7280;">
+                <span style="background: var(--card-bg); padding: 0.5rem 1rem; border-radius: 6px;">또는</span>
+            </div>
+
+            <div style="margin-bottom: 1.5rem;">
+                <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #111827;">
+                    <i class="fas fa-table"></i> 엑셀에서 복사-붙여넣기
+                </label>
+                <textarea id="excelDataInput" rows="8" placeholder="엑셀에서 데이터를 복사하여 여기에 붙여넣기 (Ctrl+V)&#10;&#10;예시:&#10;hyundai    그랜저    5000    프리미엄    선루프/통풍시트    680000&#10;kia    K5    4000    노블레스    파노라마선루프    550000"
+                    style="width: 100%; padding: 0.8rem; border: 1px solid #E5E7EB; border-radius: 6px; font-family: 'Courier New', monospace; font-size: 0.85rem; background: rgba(0,0,0,0.2); color: var(--text-main);"></textarea>
+                <button type="button" class="btn-modal btn-modal-submit" onclick="processExcelData()"
+                    style="margin-top: 0.5rem; width: 100%;">
+                    <i class="fas fa-upload"></i> 엑셀 데이터 등록
+                </button>
+            </div>
+
             <div class="upload-instructions">
-                <h4><i class="fas fa-info-circle"></i> CSV 형식 안내</h4>
-                <p>CSV 파일의 첫 줄은 헤더이며, 다음 형식을 따라야 합니다:</p>
+                <h4><i class="fas fa-info-circle"></i> 데이터 형식 안내</h4>
+
+                <p style="margin-bottom: 0.5rem;"><strong>📋 CSV 파일 형식:</strong></p>
                 <code>brand,name,vehiclePrice,grade,options,price,image</code>
-                <p style="margin-top: 0.5rem; margin-bottom: 0.5rem;">예시 (동일 차종/등급은 옵션만 추가됨):</p>
-                <code>hyundai,그랜저,5000,프리미엄,선루프/통풍시트,680000,</code><br>
-                <code>hyundai,그랜저,5000,프리미엄,HUD/전동시트,720000,</code><br>
-                <code>hyundai,그랜저,5000,프리미엄,어라운드뷰,750000,</code><br>
-                <code>kia,K5,4000,노블레스,파노라마선루프,550000,</code>
+
+                <p style="margin-top: 1rem; margin-bottom: 0.5rem;"><strong>📊 엑셀 복사 형식 (탭으로 구분):</strong></p>
+                <code>brand[탭]name[탭]vehiclePrice[탭]grade[탭]options[탭]price[탭]image</code>
+
+                <p style="margin-top: 1rem; margin-bottom: 0.5rem;">예시 (동일 차종/등급은 옵션만 추가됨):</p>
+                <code>hyundai    그랜저    5000    프리미엄    선루프/통풍시트    680000</code><br>
+                <code>hyundai    그랜저    5000    프리미엄    HUD/전동시트    720000</code><br>
+                <code>kia    K5    4000    노블레스    파노라마선루프    550000</code>
+
                 <p style="margin-top: 1rem; font-size: 0.85rem; color: #6B7280;">
                     <strong style="color: #DC2626;">⚡ 중요:</strong> brand + name + grade가 같으면 차량은 추가되지 않고 옵션만 줄바꿈으로 추가됩니다.<br>
                     * brand는 hyundai, kia, genesis, benz, bmw 중 하나여야 합니다.<br>
@@ -396,6 +417,14 @@
                     * price: 해당 옵션의 월 렌탈료 (원 단위), 필수<br>
                     * 옵션은 "옵션명 가격" 형태로 저장됩니다<br>
                     * image는 이미지 URL, 선택사항
+                </p>
+
+                <p style="margin-top: 1rem; padding: 0.75rem; background: rgba(220, 38, 38, 0.1); border-left: 3px solid #DC2626; border-radius: 4px; font-size: 0.85rem;">
+                    <strong>💡 엑셀 사용 팁:</strong><br>
+                    1. 엑셀에서 헤더 없이 데이터만 작성<br>
+                    2. 데이터 영역 선택 후 복사 (Ctrl+C)<br>
+                    3. 위 텍스트 상자에 붙여넣기 (Ctrl+V)<br>
+                    4. "엑셀 데이터 등록" 버튼 클릭
                 </p>
             </div>
 

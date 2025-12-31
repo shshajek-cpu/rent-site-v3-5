@@ -1271,10 +1271,21 @@ function openQuoteDetail(quoteId) {
                         `<span class="label">최종 월 렌탈료 (예상)</span>`;
 
                     priceContainer.innerHTML = `
-                        ${headerHtml}
-                        <h1 class="price" id="detailTotalPrice">${displayPrice.toLocaleString()}원</h1>
-                        ${isConfirmed ? '<p class="price-ready-badge">✨ 견적이 준비되었습니다!</p>' : ''}
-                        ${isTestPrice ? '<p style="font-size: 0.85rem; color: #EF4444; margin-top: 0.5rem;">⚠️ 테스트 가격 (어드민 미입력)</p>' : ''}
+                        <div class="price-container-wrapper" style="position: relative;">
+                            ${isConfirmed ? '<div class="party-popper-icon popper-left">🎉</div>' : ''}
+                            ${isConfirmed ? '<div class="party-popper-icon popper-right" style="right: 10px; transform: translateY(-50%) scaleX(-1);">🎉</div>' : ''}
+                            
+                            ${headerHtml}
+                            <h1 class="price" id="detailTotalPrice">${displayPrice.toLocaleString()}원</h1>
+                            
+                            ${isConfirmed ? `
+                                <button class="btn-check-stock pulse" onclick="alert('즉시 출고 가능한 재고 리스트로 이동합니다. (준비중)')">
+                                    <i class="fas fa-bolt"></i> 즉시 출고 가능한 재고 확인하기
+                                </button>
+                            ` : ''}
+                            
+                            ${isTestPrice ? '<p style="font-size: 0.85rem; color: #EF4444; margin-top: 0.5rem;">⚠️ 테스트 가격 (어드민 미입력)</p>' : ''}
+                        </div>
                     `;
                     priceContainer.classList.remove('ai-loading-state');
                 } else {

@@ -180,7 +180,7 @@ function renderCarList(searchTerm = '') {
             <td><strong>${car.name}</strong></td>
             <td>${car.vehiclePrice ? car.vehiclePrice.toLocaleString() + '만원' : '-'}</td>
             <td>${car.grade || '-'}</td>
-            <td style="white-space: pre-line;">${car.options ? car.options.replace(/\n/g, '<br>') : '-'}</td>
+            <td style="white-space: pre-line;">${car.options && typeof car.options === 'string' ? car.options.replace(/\n/g, '<br>') : (car.options || '-')}</td>
             <td><strong>${car.price.toLocaleString()}원</strong></td>
             <td>
                 <div class="action-buttons">
@@ -418,6 +418,7 @@ function openBulkUploadModal() {
 function closeBulkUploadModal() {
     document.getElementById('bulkUploadModal').classList.remove('active');
     document.getElementById('csvFileInput').value = '';
+    document.getElementById('excelDataInput').value = '';
 }
 
 // 드래그 앤 드롭 설정
@@ -528,6 +529,78 @@ function parseCSV(csvText) {
     processBulkUploadData(cars);
 }
 
+// 엑셀 데이터 처리
+function processExcelData() {
+    const excelData = document.getElementById('excelDataInput').value.trim();
+
+    if (!excelData) {
+        Toast.error('엑셀 데이터를 붙여넣어주세요.');
+        return;
+    }
+
+    console.log('원본 엑셀 데이터:', excelData);
+
+    // 엑셀에서 복사한 데이터는 탭(\t)으로 구분됨
+    const lines = excelData.split('\n');
+    const cars = [];
+
+    for (let i = 0; i < lines.length; i++) {
+        const line = lines[i].trim();
+        if (!line) continue;
+
+        // 탭 또는 여러 개의 공백으로 구분 (엑셀 복사 시 탭으로 구분됨)
+        let parts = line.split(/\t/).map(p => p.trim());
+
+        // 공백이 여러 개인 경우도 처리
+        if (parts.length < 6) {
+            const spaceParts = line.split(/\s{2,}/).map(p => p.trim());
+            if (spaceParts.length >= 6) {
+                parts = spaceParts;
+            }
+        }
+
+        console.log(`${i + 1}번째 줄 파싱 결과:`, parts);
+
+        if (parts.length < 6) {
+            Toast.warning(`${i + 1}번째 줄: 데이터가 부족합니다 (${parts.length}개 컬럼). 건너뜁니다.`);
+            continue;
+        }
+
+        const [brand, name, vehiclePriceStr, grade, options, priceStr, image] = parts;
+        const price = parseInt(priceStr.replace(/[^0-9]/g, ''));
+        const vehiclePrice = vehiclePriceStr ? parseInt(vehiclePriceStr.replace(/[^0-9]/g, '')) : null;
+
+        console.log(`파싱된 데이터: brand=${brand}, name=${name}, grade=${grade}, price=${price}`);
+
+        if (!price || isNaN(price)) {
+            Toast.warning(`${i + 1}번째 줄: 렌탈료가 유효하지 않습니다 (${priceStr}). 건너뜁니다.`);
+            continue;
+        }
+
+        // 옵션과 가격을 합쳐서 저장 (예: "선루프/통풍시트 680000")
+        const optionLine = options ? `${options} ${price}` : '';
+
+        cars.push({
+            brand: brand.toLowerCase(),
+            name,
+            vehiclePrice,
+            grade,
+            optionLine,
+            price,
+            image: image || ''
+        });
+    }
+
+    console.log('파싱된 차량 데이터:', cars);
+
+    if (cars.length === 0) {
+        Toast.error('등록할 차량 데이터가 없습니다.');
+        return;
+    }
+
+    processBulkUploadData(cars);
+}
+
 // 대량 등록 데이터 처리
 function processBulkUploadData(newCars) {
     // 유효성 검사
@@ -601,12 +674,15 @@ function processBulkUploadData(newCars) {
         }
     });
 
+    console.log('저장 전 DB 상태:', db);
     saveDB(db);
 
     // localDB 동기화 (중요!)
     localDB = db;
+    console.log('localDB 동기화 완료:', localDB);
 
     // UI 업데이트
+    console.log('UI 업데이트 시작...');
     updateCarListAndFilter();
     closeBulkUploadModal();
 
@@ -618,6 +694,7 @@ function processBulkUploadData(newCars) {
         message += `\n• 중복 옵션 제외: ${duplicateSkipCount}개`;
     }
 
+    console.log('처리 완료:', { newCarCount, optionAddCount, duplicateSkipCount });
     Toast.success(message);
 }
 
