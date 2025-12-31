@@ -133,7 +133,7 @@ function renderCarList(searchTerm = '') {
     if (filteredCars.length === 0) {
         tbody.innerHTML = `
             <tr>
-                <td colspan="8" class="empty-state">
+                <td colspan="11" class="empty-state">
                     <i class="fas fa-inbox"></i>
                     <p>${searchTerm ? '검색 결과가 없습니다.' : '등록된 차량이 없습니다.'}</p>
                 </td>
@@ -178,7 +178,9 @@ function renderCarList(searchTerm = '') {
                 </span>
             </td>
             <td><strong>${car.name}</strong></td>
+            <td>${car.vehiclePrice ? car.vehiclePrice.toLocaleString() + '만원' : '-'}</td>
             <td>${car.grade || '-'}</td>
+            <td>${car.options || '-'}</td>
             <td>${car.mileage || '-'}</td>
             <td><strong>${car.price.toLocaleString()}원</strong></td>
             <td>
@@ -294,7 +296,9 @@ function editCar(id) {
     document.getElementById('editCarId').value = car.id;
     document.getElementById('editBrand').value = car.brand;
     document.getElementById('editName').value = car.name;
+    document.getElementById('editVehiclePrice').value = car.vehiclePrice || '';
     document.getElementById('editGrade').value = car.grade || '';
+    document.getElementById('editOptions').value = car.options || '';
     document.getElementById('editPrice').value = car.price;
     document.getElementById('editMileage').value = car.mileage || '';
     document.getElementById('editImage').value = car.image || '';
@@ -757,7 +761,9 @@ document.addEventListener('DOMContentLoaded', function () {
             // 데이터 수집
             const brand = document.getElementById('brand').value;
             const name = document.getElementById('name').value;
+            const vehiclePriceValue = document.getElementById('vehiclePrice').value;
             const grade = document.getElementById('grade').value;
+            const optionsValue = document.getElementById('options').value;
             const priceValue = document.getElementById('price').value;
             const mileage = document.getElementById('mileage').value;
             const image = document.getElementById('image').value;
@@ -774,6 +780,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 return;
             }
 
+            // 차량가격 처리 (선택사항)
+            const vehiclePrice = vehiclePriceValue ? parseInt(vehiclePriceValue, 10) : null;
+
             // DB에 추가
             const db = getDB();
 
@@ -784,7 +793,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 id: newId,
                 brand: brand,
                 name: name,
+                vehiclePrice: vehiclePrice,
                 grade: grade,
+                options: optionsValue,
                 mileage: mileage,
                 price: price,
                 image: image
@@ -969,7 +980,9 @@ document.addEventListener('DOMContentLoaded', function () {
             const carId = document.getElementById('editCarId').value;
             const brand = document.getElementById('editBrand').value;
             const name = document.getElementById('editName').value;
+            const vehiclePriceValue = document.getElementById('editVehiclePrice').value;
             const grade = document.getElementById('editGrade').value;
+            const optionsValue = document.getElementById('editOptions').value;
             const priceValue = document.getElementById('editPrice').value;
             const mileage = document.getElementById('editMileage').value;
             const image = document.getElementById('editImage').value;
@@ -986,6 +999,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 return;
             }
 
+            // 차량가격 처리 (선택사항)
+            const vehiclePrice = vehiclePriceValue ? parseInt(vehiclePriceValue, 10) : null;
+
             // DB에서 차량 찾아서 수정
             const db = getDB();
             const carIndex = db.cars.findIndex(c => c.id === carId);
@@ -1000,7 +1016,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 id: carId,
                 brand: brand,
                 name: name,
+                vehiclePrice: vehiclePrice,
                 grade: grade,
+                options: optionsValue,
                 mileage: mileage,
                 price: price,
                 image: image

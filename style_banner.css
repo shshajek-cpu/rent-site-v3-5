@@ -1,0 +1,139 @@
+/* === HOME SLIDE BANNER === */
+.home-banner-section {
+    padding: 10px 20px;
+    margin-bottom: 0px;
+    background: transparent;
+}
+
+.banner-slider-container {
+    width: 100%;
+    height: 120px;
+    /* 차량 카드와 유사한 높이 */
+    border-radius: 20px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: var(--depth-shadow-1);
+    background: white;
+}
+
+.banner-track {
+    display: flex;
+    height: 100%;
+    transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.banner-slide {
+    min-width: 100%;
+    height: 100%;
+    padding: 20px;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+}
+
+/* 각 슬라이드별 배경 스타일 (그라디언트) */
+.banner-slide.slide-1 {
+    background: linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%);
+}
+
+.banner-slide.slide-2 {
+    background: linear-gradient(135deg, #FFF1F2 0%, #FFE4E6 100%);
+}
+
+.banner-slide.slide-3 {
+    background: linear-gradient(135deg, #F0FDF4 0%, #DCFCE7 100%);
+}
+
+.slide-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    z-index: 1;
+}
+
+.slide-text {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.slide-tag {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 4px 8px;
+    border-radius: 12px;
+    margin-bottom: 8px;
+    width: fit-content;
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(4px);
+    color: var(--text-sub);
+}
+
+.banner-slide.slide-1 .slide-tag {
+    color: #2563EB;
+    background: #DBEAFE;
+}
+
+.banner-slide.slide-2 .slide-tag {
+    color: #E11D48;
+    background: #FFE4E6;
+}
+
+.banner-slide.slide-3 .slide-tag {
+    color: #059669;
+    background: #DCFCE7;
+}
+
+.slide-text h3 {
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: var(--text-main);
+    line-height: 1.3;
+    margin-bottom: 4px;
+}
+
+.slide-text p {
+    font-size: 0.85rem;
+    color: var(--text-sub);
+    font-weight: 500;
+}
+
+.slide-img {
+    width: 80px;
+    height: 80px;
+    object-fit: contain;
+    filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1));
+    transform: rotate(-10deg) translateX(10px);
+    transition: transform 0.3s ease;
+}
+
+/* 인디케이터 (dots) */
+.banner-indicators {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 6px;
+    z-index: 2;
+}
+
+.indicator {
+    width: 6px;
+    height: 6px;
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 50%;
+    transition: all 0.3s ease;
+}
+
+.indicator.active {
+    width: 16px;
+    background-color: var(--text-main);
+    border-radius: 3px;
+}

@@ -247,7 +247,9 @@
                             <th>이미지</th>
                             <th>브랜드</th>
                             <th>모델명</th>
+                            <th>차량가격</th>
                             <th>등급</th>
+                            <th>옵션</th>
                             <th>주행거리</th>
                             <th class="sortable-header" onclick="toggleSort('price')" id="th-price">
                                 렌탈료 <i class="fas fa-sort sort-icon"></i>
@@ -296,10 +298,24 @@
                 </div>
 
                 <div class="form-group" style="margin-bottom: 1rem;">
+                    <label for="vehiclePrice"
+                        style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #111827;">차량가격 (만원)</label>
+                    <input type="number" id="vehiclePrice" placeholder="예: 5000 (5,000만원)"
+                        style="width: 100%; padding: 0.8rem; border: 1px solid #E5E7EB; border-radius: 6px; font-size: 1rem;">
+                </div>
+
+                <div class="form-group" style="margin-bottom: 1rem;">
                     <label for="grade"
                         style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #111827;">스펙
                         (등급/연료)</label>
                     <input type="text" id="grade" placeholder="예: 2.5 가솔린 프리미엄" required
+                        style="width: 100%; padding: 0.8rem; border: 1px solid #E5E7EB; border-radius: 6px; font-size: 1rem;">
+                </div>
+
+                <div class="form-group" style="margin-bottom: 1rem;">
+                    <label for="options"
+                        style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #111827;">옵션</label>
+                    <input type="text" id="options" placeholder="예: 선루프, 통풍시트, 전동시트"
                         style="width: 100%; padding: 0.8rem; border: 1px solid #E5E7EB; border-radius: 6px; font-size: 1rem;">
                 </div>
 
@@ -426,6 +442,11 @@
                         </div>
                     </div>
 
+                    <div class="form-group">
+                        <label for="editVehiclePrice">차량가격 (만원)</label>
+                        <input type="number" id="editVehiclePrice" placeholder="예: 5000 (5,000만원)">
+                    </div>
+
                     <div class="form-row">
                         <div class="form-group">
                             <label for="editGrade">등급/스펙</label>
@@ -435,6 +456,11 @@
                             <label for="editPrice">월 렌탈료 (원)</label>
                             <input type="number" id="editPrice" placeholder="예: 600000" required>
                         </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="editOptions">옵션</label>
+                        <input type="text" id="editOptions" placeholder="예: 선루프, 통풍시트, 전동시트">
                     </div>
 
                     <div class="form-group">

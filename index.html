@@ -45,6 +45,7 @@
                 </div>
             </div>
 
+
             <!-- Sticky Header (Glass) -->
             <header class="app-header">
                 <div class="header-inner">
@@ -60,6 +61,81 @@
             </header>
 
             <!-- Search Section (Floating Island) -->
+            <!-- Home Slide Banner (Moved Here) -->
+            <div class="home-banner-section" id="homeBannerSection">
+                <div class="banner-slider-container">
+                    <div class="banner-track" id="bannerTrack">
+                        <!-- Slide 1 -->
+                        <div class="banner-slide slide-1">
+                            <div class="slide-content">
+                                <div class="slide-text">
+                                    <span class="slide-tag">Hot Promotion</span>
+                                    <h3>신차 장기렌트<br>최저가 도전!</h3>
+                                    <p>지금 바로 확인해보세요</p>
+                                </div>
+                                <img src="images/icons/3d-car-front.png" alt="car" class="slide-img"
+                                    onerror="this.src='https://cdn-icons-png.flaticon.com/512/3085/3085330.png'">
+                            </div>
+                        </div>
+                        <!-- Slide 2 -->
+                        <div class="banner-slide slide-2">
+                            <div class="slide-content">
+                                <div class="slide-text">
+                                    <span class="slide-tag">즉시출고</span>
+                                    <h3>기다림 없는<br>빠른 출고 차량</h3>
+                                    <p>재고 소진 시 마감</p>
+                                </div>
+                                <img src="images/icons/3d-key.png" alt="key" class="slide-img"
+                                    onerror="this.src='https://cdn-icons-png.flaticon.com/512/263/263074.png'">
+                            </div>
+                        </div>
+                        <!-- Slide 3 -->
+                        <div class="banner-slide slide-3">
+                            <div class="slide-content">
+                                <div class="slide-text">
+                                    <span class="slide-tag">무보증 혜택</span>
+                                    <h3>초기 비용 0원<br>부담 없이 시작</h3>
+                                    <p>신용등급 영향 없음</p>
+                                </div>
+                                <img src="images/icons/3d-wallet.png" alt="wallet" class="slide-img"
+                                    onerror="this.src='https://cdn-icons-png.flaticon.com/512/272/272525.png'">
+                            </div>
+                        </div>
+                        <!-- Slide 4 -->
+                        <div class="banner-slide slide-4">
+                            <div class="slide-content">
+                                <div class="slide-text">
+                                    <span class="slide-tag">전문 상담</span>
+                                    <h3>1:1 맞춤 컨설팅<br>최적의 조건 제안</h3>
+                                    <p>전문가가 직접 안내</p>
+                                </div>
+                                <img src="images/icons/3d-handshake.png" alt="handshake" class="slide-img"
+                                    onerror="this.src='https://cdn-icons-png.flaticon.com/512/3658/3658773.png'">
+                            </div>
+                        </div>
+                        <!-- Slide 5 -->
+                        <div class="banner-slide slide-5">
+                            <div class="slide-content">
+                                <div class="slide-text">
+                                    <span class="slide-tag">전국 출고</span>
+                                    <h3>전국 어디서나<br>편리한 배송 서비스</h3>
+                                    <p>집 앞까지 무료 탁송</p>
+                                </div>
+                                <img src="images/icons/3d-car-front.png" alt="delivery" class="slide-img"
+                                    onerror="this.src='https://cdn-icons-png.flaticon.com/512/2830/2830305.png'">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="banner-indicators">
+                        <span class="indicator active"></span>
+                        <span class="indicator"></span>
+                        <span class="indicator"></span>
+                        <span class="indicator"></span>
+                        <span class="indicator"></span>
+                    </div>
+                </div>
+            </div>
+
             <div class="search-section">
                 <div class="search-input-container">
                     <i class="fas fa-search search-icon"></i>
@@ -361,10 +437,8 @@
         <!-- === VIEW: SAVED QUOTES === -->
         <section id="view-quotes" class="view-section hidden">
             <div class="content-container">
-                <div class="section-header">
-                    <h2>견적 보관함</h2>
-                    <p>저장된 견적을 확인해보세요.</p>
-                </div>
+                <!-- Header removed for compact view -->
+                <div class="section-header" style="display: none;"></div>
 
                 <div id="savedQuotesList" class="saved-quotes-list">
                     <!-- JS로 렌더링 -->
@@ -380,9 +454,10 @@
                 <!-- Quote Detail View (Hidden by default) -->
                 <div id="quoteDetailView" class="quote-detail-view hidden">
                     <div class="detail-header-row">
-                        <button class="btn-back-text" onclick="closeQuoteDetail()">
-                            <i class="fas fa-chevron-left"></i> 목록으로
+                        <button class="icon-btn" onclick="closeQuoteDetail()">
+                            <i class="fas fa-chevron-left"></i>
                         </button>
+                        <span class="header-title">목록으로</span>
                     </div>
 
                     <div class="quote-detail-card">
@@ -395,7 +470,7 @@
                         </div>
 
                         <!-- Final Rental Fee (Moved Above Accordion) -->
-                        <div class="detail-price-box">
+                        <div class="detail-price-box" id="quoteDetailPriceBox">
                             <span class="label">최종 월 렌탈료</span>
                             <h1 class="price" id="detailTotalPrice">0원</h1>
                         </div>
@@ -434,23 +509,7 @@
 
         <!-- VIEW: GUIDE -->
         <section id="view-guide" class="view-section hidden">
-            <div class="header-spacer"></div>
-            <div class="content-container" style="padding: 20px;">
-                <div class="section-header">
-                    <h2>이용 가이드</h2>
-                    <p>서비스 이용 방법을 안내해드립니다.</p>
-                </div>
-
-                <div class="guide-content"
-                    style="background: white; border-radius: 20px; padding: 24px; box-shadow: var(--depth-shadow-1); text-align: center;">
-                    <i class="fas fa-tools"
-                        style="font-size: 3rem; color: var(--cta-color); margin-bottom: 16px; opacity: 0.5;"></i>
-                    <h3 style="font-size: 1.2rem; font-weight: 700; margin-bottom: 8px;">준비 중입니다</h3>
-                    <p style="color: var(--text-sub); line-height: 1.6;">
-                        더 나은 서비스를 위해<br>가이드 내용을 정리하고 있습니다.<br>조금만 기다려주세요!
-                    </p>
-                </div>
-            </div>
+            <!-- 새로운 내용이 여기에 추가됩니다 -->
         </section>
 
         <!-- Bottom Navigation -->
@@ -479,7 +538,7 @@
     <!-- Login Popup Modal -->
     <div class="login-popup" id="loginPopup">
         <div class="login-popup-header">
-            <i class="fas fa-car"></i>
+            <img src="images/icons/3d-timer.png" alt="timer" class="login-popup-img">
             <h2>본 페이지는 링크를 부여받은<br>고객만을 위한 안내페이지입니다.</h2>
         </div>
 

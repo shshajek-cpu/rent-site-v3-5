@@ -410,8 +410,18 @@ label {
    =================================================== */
 
 .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
     background: rgba(0, 0, 0, 0.8);
     backdrop-filter: blur(10px);
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-overlay.active {
+    display: flex;
 }
 
 .modal-content {
@@ -419,6 +429,12 @@ label {
     border: 1px solid rgba(255, 255, 255, 0.1);
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.9), 0 0 30px rgba(220, 38, 38, 0.1);
     animation: modalPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    max-width: 500px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+    border-radius: 16px;
+    padding: 2rem;
 }
 
 @keyframes modalPop {

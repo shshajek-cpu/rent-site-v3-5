@@ -48,6 +48,10 @@ function renderQuotesTable() {
         // 고객 번호 표시 (010-xxxx-xxxx 형식)
         const customerPhone = quote.customerPhone || '-';
 
+        // 버튼 텍스트와 클래스를 조건부로 설정
+        const buttonText = quote.adminFinalPrice ? '가격 수정' : '가격입력';
+        const buttonClass = quote.adminFinalPrice ? 'btn-primary' : 'btn-secondary';
+
         return `
             <tr>
                 <td><strong>${index + 1}</strong></td>
@@ -60,6 +64,9 @@ function renderQuotesTable() {
                 <td>${term}</td>
                 <td>${mileage}</td>
                 <td style="font-size: 0.85rem; line-height: 1.6;">${optionsDisplay}</td>
+                <td style="font-family: 'Courier New', monospace; color: var(--text-sub);">
+                    ${quote.totalPrice ? quote.totalPrice.toLocaleString() + '원' : '-'}
+                </td>
                 <td style="font-family: 'Courier New', monospace;">
                     ${quote.adminFinalPrice ?
                 `<strong style="color: var(--primary-color);">${quote.adminFinalPrice.toLocaleString()}원</strong>` :
@@ -68,8 +75,8 @@ function renderQuotesTable() {
                 </td>
                 <td><span class="status-badge ${statusClass}">${statusText}</span></td>
                 <td>
-                    <button class="btn-secondary" onclick="openEditModal('${quote.id}')" style="padding: 0.4rem 0.8rem; font-size: 0.85rem;">
-                        <i class="fas fa-edit"></i> 가격입력
+                    <button class="${buttonClass}" onclick="openEditModal('${quote.id}')" style="padding: 0.4rem 0.8rem; font-size: 0.85rem;">
+                        <i class="fas fa-edit"></i> ${buttonText}
                     </button>
                     <button class="btn-delete" onclick="deleteQuote('${quote.id}')" style="padding: 0.4rem 0.8rem; font-size: 0.85rem; margin-left: 0.5rem;">
                         <i class="fas fa-trash"></i>
@@ -146,11 +153,21 @@ function saveQuoteFinalPrice(event) {
 
     // Also update in savedQuotes (customer's view)
     const savedQuotes = JSON.parse(localStorage.getItem('savedQuotes') || '[]');
-    const customerQuote = savedQuotes.find(q => q.id === quoteId);
+
+    // Fix: For requotes, we need to find the original quote ID
+    // If quote.originalQuoteId exists, use it. Otherwise use quoteId.
+    const targetCustomerQuoteId = quote.originalQuoteId || quoteId;
+    const customerQuote = savedQuotes.find(q => q.id === targetCustomerQuoteId);
+
     if (customerQuote) {
         customerQuote.adminFinalPrice = finalPrice;
         localStorage.setItem('savedQuotes', JSON.stringify(savedQuotes));
     }
+
+    // 커스텀 이벤트 발송 (동일 탭에서 실시간 업데이트용)
+    window.dispatchEvent(new CustomEvent('quotePriceUpdated', {
+        detail: { quoteId: quoteId, finalPrice: finalPrice }
+    }));
 
     // Success feedback
     alert('최종 렌탈료가 저장되었습니다!');
@@ -164,8 +181,17 @@ function deleteQuote(quoteId) {
     if (!confirm('이 견적을 삭제하시겠습니까?')) return;
 
     const adminQuotes = JSON.parse(localStorage.getItem('adminQuotes') || '[]');
+    const quoteToDelete = adminQuotes.find(q => q.id === quoteId);
+
+    // 1. Delete from Admin Quotes
     const filtered = adminQuotes.filter(q => q.id !== quoteId);
     localStorage.setItem('adminQuotes', JSON.stringify(filtered));
+
+    // 2. Delete from User's Saved Quotes (Sync)
+    const savedQuotes = JSON.parse(localStorage.getItem('savedQuotes') || '[]');
+    // Also remove if it matches id or originalQuoteId (for requotes)
+    const newSavedQuotes = savedQuotes.filter(q => q.id !== quoteId && q.id !== quoteToDelete?.originalQuoteId);
+    localStorage.setItem('savedQuotes', JSON.stringify(newSavedQuotes));
 
     loadQuotes();
 }
@@ -174,5 +200,13 @@ function deleteQuote(quoteId) {
 function logout() {
     if (confirm('로그아웃 하시겠습니까?')) {
         localStorage.removeItem('adminToken');
-                    window.location.href = 'admin-list.html';    }
+        window.location.href = 'admin-list.html';
+    }
 }
+
+// Auto-refresh when localStorage changes (e.g. deletion from customer view)
+window.addEventListener('storage', (event) => {
+    if (event.key === 'adminQuotes') {
+        loadQuotes();
+    }
+});
