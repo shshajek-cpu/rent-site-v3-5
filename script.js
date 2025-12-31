@@ -342,13 +342,16 @@ function renderCars(cars) {
             imageContent = `<i class="fas fa-car" style="font-size: 2rem; color: #CBD5E1;"></i>`;
         }
 
+        // 차량가격 표시 (만원 단위)
+        const vehiclePriceText = car.vehiclePrice ? `${car.vehiclePrice.toLocaleString()}만원` : '';
+
         carEl.innerHTML = `
                 <div class="car-image-container">${imageContent}</div>
                 <div class="car-info-compact">
                     <div class="car-row-main">
                         <h3 class="car-name">${highlightedName}</h3>
                         <div class="price-group-compact">
-                            <span class="price-value">${car.price.toLocaleString()}</span>
+                            <span class="price-value">${(car.price || 0).toLocaleString()}~</span>
                             <span class="month-unit">원</span>
                         </div>
                     </div>
@@ -357,7 +360,7 @@ function renderCars(cars) {
                         <span class="divider">|</span>
                         <div class="car-specs-compact">
                             <span>${highlightedGrade}</span>
-                            <span>${car.mileage}</span>
+                            ${vehiclePriceText ? `<span class="divider">•</span><span>${vehiclePriceText}</span>` : ''}
                         </div>
                     </div>
                 </div>
@@ -1264,7 +1267,10 @@ function openQuoteDetail(quoteId) {
                             contentBody = '<div style="padding:10px;">옵션 목록을 표시할 수 없습니다.</div>';
                         }
                     } else {
-                        contentBody = `<div class="accordion-options-grid ${item.id === 'region' ? 'full-width' : ''}">
+                        const isTerm = item.id === 'term';
+                        const gridStyle = isTerm ? 'grid-template-columns: repeat(3, 1fr);' : '';
+
+                        contentBody = `<div class="accordion-options-grid ${item.id === 'region' ? 'full-width' : ''}" style="${gridStyle}">
                             ${item.options.map(opt => {
                             const isSelected = item.currentValue === opt ? 'selected' : '';
                             return `<button class="accordion-option-btn ${isSelected}" onclick="selectAccordionOption(this, '${item.id}')">${opt}</button>`;
@@ -1848,12 +1854,10 @@ function renderSavedQuotes() {
             </div>
             <div class="info-card-content">
                 <h4>견적 보관함 안내</h4>
-                <ul>
-                    <li><strong>대기중</strong>: 견적 검토를 기다리고 있어요</li>
-                    <li><strong>진행중</strong>: 담당자가 견적을 확인 중이에요</li>
-                    <li><strong>완료</strong>: 최종 견적이 확정되었어요</li>
-                </ul>
-                <p class="info-note">견적을 클릭하면 상세 내용을 확인할 수 있어요.</p>
+                <p class="info-note" style="margin-top: 0; font-size: 0.95rem; line-height: 1.6; color: #555;">
+                    요청한 견적들을 클릭해 <span style="color: #e83e3e; font-weight: 700;">보관함</span>에 보관해두었어요<br>
+                    확정으로 변하면 <span style="color: #e83e3e; font-weight: 700;">최종 렌탈료</span> 확인이 가능해요 !
+                </p>
             </div>
         </div>
     `;
