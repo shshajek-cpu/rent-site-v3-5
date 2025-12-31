@@ -1271,21 +1271,18 @@ function openQuoteDetail(quoteId) {
                         `<span class="label">최종 월 렌탈료 (예상)</span>`;
 
                     priceContainer.innerHTML = `
-                        <div class="price-container-wrapper" style="position: relative;">
-                            ${isConfirmed ? '<div class="party-popper-icon popper-left">🎉</div>' : ''}
-                            ${isConfirmed ? '<div class="party-popper-icon popper-right" style="right: 10px; transform: translateY(-50%) scaleX(-1);">🎉</div>' : ''}
-                            
-                            ${headerHtml}
-                            <h1 class="price" id="detailTotalPrice">${displayPrice.toLocaleString()}원</h1>
-                            
-                            ${isConfirmed ? `
-                                <button class="btn-check-stock pulse" onclick="alert('즉시 출고 가능한 재고 리스트로 이동합니다. (준비중)')">
-                                    <i class="fas fa-bolt"></i> 즉시 출고 가능한 재고 확인하기
-                                </button>
-                            ` : ''}
-                            
-                            ${isTestPrice ? '<p style="font-size: 0.85rem; color: #EF4444; margin-top: 0.5rem;">⚠️ 테스트 가격 (어드민 미입력)</p>' : ''}
+                        ${headerHtml}
+                        <h1 class="price" id="detailTotalPrice">${displayPrice.toLocaleString()}원</h1>
+                        ${isConfirmed ? `
+                        <div class="confirm-cta-container">
+                            <div class="firecracker-3d left">🎉</div>
+                            <button class="btn-dynamic-confirm" onclick="requestConsultation()">
+                                견적 확정하고<br>즉시 출고 가능 확인하기
+                            </button>
+                            <div class="firecracker-3d right">🎉</div>
                         </div>
+                        ` : ''}
+                        ${isTestPrice ? '<p style="font-size: 0.85rem; color: #EF4444; margin-top: 0.5rem;">⚠️ 테스트 가격 (어드민 미입력)</p>' : ''}
                     `;
                     priceContainer.classList.remove('ai-loading-state');
                 } else {
@@ -1900,6 +1897,15 @@ function renderFAQ() {
     console.log('[renderFAQ] Rendering complete');
 }
 
+// Helper for Dynamic Quote Button
+function requestConsultation() {
+    if (typeof openQuoteConfirmModal === 'function') {
+        openQuoteConfirmModal();
+    } else {
+        alert('견적 확정/상담 신청 기능이 준비 중입니다.');
+    }
+}
+
 // --- REVIEWS VIEW LOGIC ---
 
 function getReviews() {
@@ -1917,39 +1923,40 @@ function renderReviews() {
 
     if (reviews.length === 0) {
         container.innerHTML = `
-            <div class="empty-state">
+                    < div class="empty-state" >
                 <i class="fas fa-star"></i>
                 <p>아직 등록된 출고 후기가 없습니다.</p>
-            </div>
-        `;
+            </div >
+                    `;
         return;
     }
 
     container.innerHTML = reviews.map(review => `
-        <div class="review-card">
-            ${review.image ? `
+                    < div class="review-card" >
+                        ${review.image ? `
                 <div class="review-image">
                     <img src="${review.image}" alt="${review.carName}">
                 </div>
-            ` : ''}
-            <div class="review-content">
-                <div class="review-header">
-                    <div class="review-car-info">
-                        <span class="review-brand">${getBrandName(review.carBrand)}</span>
-                        <h3 class="review-car-name">${review.carName}</h3>
+            ` : ''
+        }
+                <div class="review-content">
+                    <div class="review-header">
+                        <div class="review-car-info">
+                            <span class="review-brand">${getBrandName(review.carBrand)}</span>
+                            <h3 class="review-car-name">${review.carName}</h3>
+                        </div>
+                        <div class="review-rating">
+                            ${generateStars(review.rating)}
+                        </div>
                     </div>
-                    <div class="review-rating">
-                        ${generateStars(review.rating)}
+                    <p class="review-text">${review.content}</p>
+                    <div class="review-footer">
+                        <span class="review-author">${review.customerName}</span>
+                        <span class="review-date">${review.date}</span>
                     </div>
                 </div>
-                <p class="review-text">${review.content}</p>
-                <div class="review-footer">
-                    <span class="review-author">${review.customerName}</span>
-                    <span class="review-date">${review.date}</span>
-                </div>
-            </div>
-        </div>
-    `).join('');
+        </div >
+                    `).join('');
 }
 
 function getBrandName(brandId) {
@@ -1978,11 +1985,11 @@ function generateStars(rating) {
 // Animation Styles
 const styleSheet = document.createElement("style");
 styleSheet.textContent = `
-    @keyframes fadeInUp {
+                @keyframes fadeInUp {
         from { opacity: 0; transform: translateY(20px); }
         to { opacity: 1; transform: translateY(0); }
-    }
-`;
+                }
+                `;
 document.head.appendChild(styleSheet);
 
 // ========================================
@@ -2160,13 +2167,13 @@ function updateRemainingTime() {
     // 남은 시간을 분:초로 변환
     const minutes = Math.floor(remaining / 60000);
     const seconds = Math.floor((remaining % 60000) / 1000);
-    const timeString = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+    const timeString = `${minutes}:${seconds.toString().padStart(2, '0')} `;
 
     // 전화번호 뒷 4자리
     const last4Digits = loginData.phone.replace(/[^0-9]/g, '').slice(-4);
 
     // 텍스트 업데이트
-    loginStatusText.textContent = `${last4Digits} 로그인 중 (${timeString} 남음)`;
+    loginStatusText.textContent = `${last4Digits} 로그인 중(${timeString} 남음)`;
 }
 
 // Schedules the auto-logout timer
@@ -2404,13 +2411,13 @@ function transitionToFinalPrice(finalPrice) {
     setTimeout(() => {
         // Step 2: Update content
         priceContainer.innerHTML = `
-            <div class="price-header-row" style="display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 4px;">
+                    < div class="price-header-row" style = "display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 4px;" >
                 <span class="label" style="margin-bottom: 0;">최종 월 렌탈료</span>
                 <span class="quote-status-badge complete" style="font-size: 0.75rem; padding: 2px 8px;">확정</span>
-            </div>
+            </div >
             <h1 class="price" id="detailTotalPrice">${finalPrice.toLocaleString()}원</h1>
             <p class="price-ready-badge">✨ 견적이 준비되었습니다!</p>
-        `;
+                `;
         priceContainer.classList.remove('ai-loading-state');
 
         // Step 3: Fade in final price
@@ -2434,7 +2441,7 @@ function initHomeBanner() {
     function goToSlide(index) {
         currentSlide = index;
         const offset = -currentSlide * 100; // Move left by 100% per slide
-        bannerTrack.style.transform = `translateX(${offset}%)`;
+        bannerTrack.style.transform = `translateX(${offset} %)`;
 
         // Update indicators
         indicators.forEach((indicator, i) => {
