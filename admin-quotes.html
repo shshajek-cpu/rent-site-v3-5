@@ -8,6 +8,106 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
     <link rel="stylesheet" href="admin.css">
+    <style>
+        /* 견적관리 테이블 컬럼 너비 최적화 */
+        #quotesTableBody tr th:nth-child(1),
+        #quotesTableBody tr td:nth-child(1) {
+            width: 80px;
+            padding: 1rem 0.8rem;
+            text-align: center;
+        }
+
+        #quotesTableBody tr th:nth-child(2),
+        #quotesTableBody tr td:nth-child(2) {
+            width: 130px;
+            padding: 1rem 0.8rem;
+        }
+
+        #quotesTableBody tr th:nth-child(3),
+        #quotesTableBody tr td:nth-child(3) {
+            width: 160px;
+            padding: 1rem 0.8rem;
+            font-size: 0.85rem;
+        }
+
+        #quotesTableBody tr th:nth-child(4),
+        #quotesTableBody tr td:nth-child(4) {
+            width: 130px;
+            padding: 1rem 0.8rem;
+        }
+
+        #quotesTableBody tr th:nth-child(5),
+        #quotesTableBody tr td:nth-child(5) {
+            width: 100px;
+            padding: 1rem 0.8rem;
+        }
+
+        #quotesTableBody tr th:nth-child(6),
+        #quotesTableBody tr td:nth-child(6) {
+            width: 90px;
+            padding: 1rem 0.8rem;
+            text-align: center;
+        }
+
+        #quotesTableBody tr th:nth-child(7),
+        #quotesTableBody tr td:nth-child(7) {
+            width: 100px;
+            padding: 1rem 0.8rem;
+            text-align: center;
+        }
+
+        /* 옵션 컬럼 - 가장 넓게, 여백 충분히 */
+        #quotesTableBody tr th:nth-child(8),
+        #quotesTableBody tr td:nth-child(8) {
+            width: 280px;
+            padding: 1rem 1.2rem;
+            line-height: 1.7;
+            max-width: 280px;
+            word-break: break-word;
+        }
+
+        #quotesTableBody tr th:nth-child(9),
+        #quotesTableBody tr td:nth-child(9) {
+            width: 110px;
+            padding: 1rem 0.8rem;
+            text-align: right;
+        }
+
+        #quotesTableBody tr th:nth-child(10),
+        #quotesTableBody tr td:nth-child(10) {
+            width: 120px;
+            padding: 1rem 0.8rem;
+            text-align: right;
+        }
+
+        #quotesTableBody tr th:nth-child(11),
+        #quotesTableBody tr td:nth-child(11) {
+            width: 90px;
+            padding: 1rem 0.8rem;
+            text-align: center;
+        }
+
+        #quotesTableBody tr th:nth-child(12),
+        #quotesTableBody tr td:nth-child(12) {
+            width: 160px;
+            padding: 1rem 0.8rem;
+            text-align: center;
+        }
+
+        /* 테이블 헤더에도 동일한 너비 적용 */
+        .data-table thead th:nth-child(1) { width: 80px; padding: 1rem 0.8rem; text-align: center; }
+        .data-table thead th:nth-child(2) { width: 130px; padding: 1rem 0.8rem; }
+        .data-table thead th:nth-child(3) { width: 160px; padding: 1rem 0.8rem; }
+        .data-table thead th:nth-child(4) { width: 130px; padding: 1rem 0.8rem; }
+        .data-table thead th:nth-child(5) { width: 100px; padding: 1rem 0.8rem; }
+        .data-table thead th:nth-child(6) { width: 90px; padding: 1rem 0.8rem; text-align: center; }
+        .data-table thead th:nth-child(7) { width: 100px; padding: 1rem 0.8rem; text-align: center; }
+        .data-table thead th:nth-child(8) { width: 280px; padding: 1rem 1.2rem; }
+        .data-table thead th:nth-child(9) { width: 110px; padding: 1rem 0.8rem; text-align: right; }
+        .data-table thead th:nth-child(10) { width: 120px; padding: 1rem 0.8rem; text-align: right; }
+        .data-table thead th:nth-child(11) { width: 90px; padding: 1rem 0.8rem; text-align: center; }
+        .data-table thead th:nth-child(12) { width: 160px; padding: 1rem 0.8rem; text-align: center; }
+    </style>
 </head>
 
 <body>

@@ -476,36 +476,101 @@ function initLiveCountdown() {
 // --- DETAIL VIEW LOGIC (Merged) ---
 
 // --- OPTION LOGIC ---
-const OPTION_POOL = [
-    { name: "썬루프", price: 5000, icon: "fa-sun" },
-    { name: "헤드업 디스플레이", price: 4000, icon: "fa-desktop" },
-    { name: "프리미엄 사운드", price: 8000, icon: "fa-music" },
-    { name: "LED 패키지", price: 6000, icon: "fa-lightbulb" },
-    { name: "스마트 커넥트", price: 3000, icon: "fa-wifi" },
-    { name: "드라이빙 어시스턴트", price: 12000, icon: "fa-car-side" },
-    { name: "컴포트 패키지", price: 7000, icon: "fa-couch" },
-    { name: "통풍 시트", price: 4500, icon: "fa-wind" },
-    { name: "어라운드 뷰", price: 9000, icon: "fa-camera" },
-    { name: "빌트인 캠 2", price: 4000, icon: "fa-video" }
-];
+
+// 옵션 이름 키워드와 아이콘 매칭 맵
+const OPTION_ICON_MAP = {
+    '선루프': 'fa-sun',
+    '썬루프': 'fa-sun',
+    'HUD': 'fa-desktop',
+    '헤드업': 'fa-desktop',
+    '디스플레이': 'fa-desktop',
+    '사운드': 'fa-music',
+    '오디오': 'fa-music',
+    'LED': 'fa-lightbulb',
+    '조명': 'fa-lightbulb',
+    '라이트': 'fa-lightbulb',
+    '커넥트': 'fa-wifi',
+    '스마트': 'fa-wifi',
+    '어시스턴트': 'fa-car-side',
+    '주행': 'fa-car-side',
+    '패키지': 'fa-couch',
+    '컴포트': 'fa-couch',
+    '통풍': 'fa-wind',
+    '시트': 'fa-couch',
+    '어라운드': 'fa-camera',
+    '카메라': 'fa-camera',
+    '뷰': 'fa-camera',
+    '캠': 'fa-video',
+    '전동': 'fa-cog',
+    '파워': 'fa-cog',
+    '열선': 'fa-fire',
+    '히터': 'fa-fire',
+    '크루즈': 'fa-tachometer-alt',
+    '내비': 'fa-map-marked-alt',
+    '네비': 'fa-map-marked-alt',
+    '휠': 'fa-circle',
+    '도어': 'fa-door-open',
+    '트렁크': 'fa-box-open'
+};
+
+// 옵션 이름에서 아이콘 찾기
+function matchOptionIcon(optionName) {
+    for (const [keyword, icon] of Object.entries(OPTION_ICON_MAP)) {
+        if (optionName.includes(keyword)) {
+            return icon;
+        }
+    }
+    return 'fa-star'; // 기본 아이콘
+}
 
 function getOrGenerateOptions(carId) {
     const car = db.cars.find(c => c.id == carId);
-    if (!car) return [];
-
-    // If options already exist, return them
-    if (car.options && car.options.length > 0) {
-        return car.options;
+    if (!car) {
+        console.log('[옵션 디버깅] 차량을 찾을 수 없음:', carId);
+        return [];
     }
 
-    // Generate random options (4 to 8 options)
-    const count = Math.floor(Math.random() * (8 - 4 + 1)) + 4;
-    const shuffled = [...OPTION_POOL].sort(() => 0.5 - Math.random());
-    car.options = shuffled.slice(0, count);
+    console.log('[옵션 디버깅] 차량 정보:', car);
+    console.log('[옵션 디버깅] car.options 타입:', typeof car.options);
+    console.log('[옵션 디버깅] car.options 값:', car.options);
 
-    // Save to LocalStorage
-    localStorage.setItem('carDB', JSON.stringify(db));
-    return car.options;
+    // 문자열 형식의 옵션 파싱 ("옵션명 가격\n옵션명 가격" 형식)
+    if (typeof car.options === 'string' && car.options.trim()) {
+        const optionLines = car.options.split('\n').filter(line => line.trim());
+        console.log('[옵션 디버깅] 파싱된 옵션 라인:', optionLines);
+
+        const parsedOptions = optionLines.map(line => {
+            // "옵션명 가격" 형식 파싱 (마지막 공백 기준으로 분리)
+            const trimmedLine = line.trim();
+            const lastSpaceIndex = trimmedLine.lastIndexOf(' ');
+
+            if (lastSpaceIndex === -1) {
+                // 공백이 없으면 전체를 옵션명으로 처리
+                return {
+                    name: trimmedLine,
+                    price: 0,
+                    icon: matchOptionIcon(trimmedLine)
+                };
+            }
+
+            const name = trimmedLine.substring(0, lastSpaceIndex).trim();
+            const priceStr = trimmedLine.substring(lastSpaceIndex + 1).trim();
+            const price = parseInt(priceStr) || 0;
+
+            return {
+                name: name,
+                price: price,
+                icon: matchOptionIcon(name)
+            };
+        }).filter(opt => opt.name); // 이름이 있는 옵션만 반환
+
+        console.log('[옵션 디버깅] 최종 파싱된 옵션:', parsedOptions);
+        return parsedOptions;
+    }
+
+    // 옵션이 없으면 빈 배열 반환 (더 이상 랜덤 생성 안 함)
+    console.log('[옵션 디버깅] 옵션이 없거나 문자열이 아님');
+    return [];
 }
 
 function renderOptions(carId) {
@@ -1923,16 +1988,16 @@ function renderReviews() {
 
     if (reviews.length === 0) {
         container.innerHTML = `
-                    < div class="empty-state" >
+            <div class="empty-state">
                 <i class="fas fa-star"></i>
                 <p>아직 등록된 출고 후기가 없습니다.</p>
-            </div >
-                    `;
+            </div>
+        `;
         return;
     }
 
     container.innerHTML = reviews.map(review => `
-                    < div class="review-card" >
+        <div class="review-card">
                         ${review.image ? `
                 <div class="review-image">
                     <img src="${review.image}" alt="${review.carName}">
@@ -2411,13 +2476,19 @@ function transitionToFinalPrice(finalPrice) {
     setTimeout(() => {
         // Step 2: Update content
         priceContainer.innerHTML = `
-                    < div class="price-header-row" style = "display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 4px;" >
+            <div class="price-header-row" style="display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 4px;">
                 <span class="label" style="margin-bottom: 0;">최종 월 렌탈료</span>
                 <span class="quote-status-badge complete" style="font-size: 0.75rem; padding: 2px 8px;">확정</span>
-            </div >
+            </div>
             <h1 class="price" id="detailTotalPrice">${finalPrice.toLocaleString()}원</h1>
-            <p class="price-ready-badge">✨ 견적이 준비되었습니다!</p>
-                `;
+            <div class="confirm-cta-container">
+                <div class="firecracker-3d left">🎉</div>
+                <button class="btn-dynamic-confirm" onclick="requestConsultation()">
+                    견적 확정하고<br>즉시 출고 가능 확인하기
+                </button>
+                <div class="firecracker-3d right">🎉</div>
+            </div>
+        `;
         priceContainer.classList.remove('ai-loading-state');
 
         // Step 3: Fade in final price
